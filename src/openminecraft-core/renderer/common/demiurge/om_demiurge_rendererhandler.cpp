@@ -12,18 +12,17 @@
 #include "openminecraft/renderer/common/om_renderer_texture.hpp"
 #include "openminecraft/renderer/common/wrap/om_renderer_temptarget.hpp"
 #include "openminecraft/renderer/om_renderer_layer.hpp"
+#include <array>
+#include <chrono>
+#include <iostream>
 #include <memory>
+#include <random>
 #include <string>
 #include <unordered_map>
 
 namespace openminecraft::renderer::common::demiurge
 {
-struct SimpleUniform
-{
-    float width;
-    float height;
-};
-
+static std::chrono::steady_clock::time_point tp = {};
 OMDemiurgeRendererHandler::OMDemiurgeRendererHandler(OMRenderer *renderer, std::shared_ptr<OMDemiurgeNode> n)
     : OMRendererHandler(renderer), renderer(renderer), rect(renderer, [&]() -> void { recordTask(); }),
       roundedRect(renderer, [&]() -> void { recordTask(); }), image(renderer, [&]() -> void { recordTask(); }),
@@ -32,7 +31,8 @@ OMDemiurgeRendererHandler::OMDemiurgeRendererHandler(OMRenderer *renderer, std::
 {
     node = n;
 
-    uniformBuffer = renderer->allocateBuffer(Uniform, sizeof(SimpleUniform));
+    uniformBuffer = renderer->allocateBuffer(Uniform, sizeof(float) * 2);
+    uniformBuffer2 = renderer->allocateBuffer(Uniform, sizeof(float));
 
     auto ext = renderer->getExtent();
     middleTarget = new wrap::OMRendererTempTarget(renderer);
@@ -44,10 +44,35 @@ OMDemiurgeRendererHandler::OMDemiurgeRendererHandler(OMRenderer *renderer, std::
     sector.init(uniformBuffer, middleTarget->target);
     clipRect.init(uniformBuffer, middleTarget->target);
     svg.init(uniformBuffer, middleTarget->target);
+
+    basics::OMVertexFormat simp;
+    simp.nextGroup()->decideStruct();
+
+    pipe =
+        renderer->createPipeline()
+            ->input(UniformBuffer)
+            ->inputName("ScreenData")
+            ->input(UniformBuffer)
+            ->inputName("Time")
+            ->output(middleTarget->target)
+            ->shader(renderer->shaderManager.preprocess("demiurge/scene/scene2.vert.glsl", Vertex, GLSLSource, simp))
+            ->shader(renderer->shaderManager.preprocess("demiurge/scene/scene2.frag.glsl", Fragment, GLSLSource, simp))
+            ->format(simp)
+            ->blendFunc({SrcAlpha, OneMinusSrcAlpha, One, OneMinusSrcAlpha})
+            ->blend(true)
+            ->depth(false, false)
+            ->depthOp(LessOrEqual)
+            ->buildN();
+    pipe->bindInput(0, uniformBuffer);
+    pipe->bindInput(1, uniformBuffer2);
+
+    tp = std::chrono::steady_clock::now();
 }
 
 OMDemiurgeRendererHandler::~OMDemiurgeRendererHandler()
 {
+    delete pipe;
+
     rect.destroy();
     roundedRect.destroy();
     image.destroy();
@@ -59,6 +84,7 @@ OMDemiurgeRendererHandler::~OMDemiurgeRendererHandler()
         p.second->destroy();
     }
     delete uniformBuffer;
+    delete uniformBuffer2;
 
     delete middleTarget;
 }
@@ -82,8 +108,7 @@ void OMDemiurgeRendererHandler::submitTasks()
     middleTarget->construct(renderer->getExtent());
 
     auto ext = renderer->getLogicalExtent();
-    SimpleUniform u{ext.x, ext.y};
-    uniformBuffer->updateData(&u);
+    uniformBuffer->updateData(std::array<float, 2>{ext.x, ext.y}.data());
 
     renderer->createTask("demiurgeui_compose");
     recordTask(true);
@@ -107,6 +132,7 @@ void OMDemiurgeRendererHandler::recordTask(bool resize)
             p.second->submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         }
     }
+    task->pipeline(pipe)->draw(6);
     task->finish();
     if (!resize)
     {
@@ -131,6 +157,10 @@ void OMDemiurgeRendererHandler::beforeFrame()
     {
         p.second->update();
     }
+
+    auto f =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - tp).count() / 1000.0f;
+    uniformBuffer2->updateData(&f);
 }
 
 void OMDemiurgeRendererHandler::afterFrame()

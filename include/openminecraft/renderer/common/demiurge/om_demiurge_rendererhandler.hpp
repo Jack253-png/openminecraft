@@ -52,7 +52,10 @@ class OMDemiurgeRendererHandler : public OMRendererHandler
 
     wrap::OMRendererTempTarget *middleTarget;
     OMRendererBuffer *uniformBuffer;
+    OMRendererBuffer *uniformBuffer2;
     OMRenderer *renderer;
+
+    OMRendererPipeline *pipe;
 
     element::OMDemiurgeRectChannel rect;
     element::OMDemiurgeRoundedRectChannel roundedRect;
