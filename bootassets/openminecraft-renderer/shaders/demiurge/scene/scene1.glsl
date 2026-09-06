@@ -261,7 +261,7 @@ void main()
 
     vec4 fg = vec4(0.);
     int n = 5;
-    if (uv.y < 0.5)
+    if (uv.y < 1.0)
         for (int i = 0; i < n; i++)
         {
             fg += foreground(uv, t + 4. * float(i) / float(n) / 60.) / (float(n));
