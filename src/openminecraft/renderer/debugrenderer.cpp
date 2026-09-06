@@ -5,8 +5,10 @@
 #include "openminecraft/renderer/common/demiurge/node/om_demiurge_svg.hpp"
 #include "openminecraft/renderer/common/demiurge/node/om_demiurge_textsdf.hpp"
 #include "openminecraft/vfs/om_vfs_base.hpp"
+#include <array>
 #include <iostream>
 #include <memory>
+#include <string>
 
 using namespace openminecraft::renderer;
 using namespace openminecraft;
@@ -14,6 +16,27 @@ using namespace openminecraft::renderer::common::demiurge;
 
 namespace openminecraftshell::renderer
 {
+const std::array<std::string, 8> loadingRing = {
+    "M2.757 6.046c-.263.123-.38.439-.214.676a3 3 0 1 0 .012-3.46c-.168.235-.053.552.21.676.261.125.57.007.76-.213a1.95 "
+    "1.95 0 1 1-.01 2.54c-.188-.221-.495-.341-.758-.219",
+    "M2.563 4.57C2.277 4.52 2 4.711 2 5.001a3 3 0 1 0 "
+    "1.995-2.828c-.273.098-.36.423-.218.675.144.252.464.332.745.261A1.95 1.95 0 1 1 3.06 "
+    "5.184c-.028-.288-.21-.563-.496-.614",
+    "M3.954 2.757c-.123-.263-.439-.38-.676-.214a3 3 0 1 0 "
+    "3.46.012c-.235-.168-.552-.053-.676.21-.125.261-.007.57.213.76a1.95 1.95 0 1 "
+    "1-2.54-.01c.221-.187.341-.495.219-.758",
+    "M5.846 2.674c.1-.272-.041-.578-.327-.629a3 3 0 1 0 2.44 "
+    "2.456c-.05-.286-.354-.429-.627-.331-.274.097-.408.399-.387.688a1.95 1.95 0 1 "
+    "1-1.79-1.802c.29.023.592-.11.691-.382",
+    "M7.243 3.954c.263-.123.38-.438.214-.676a3 3 0 1 0-.012 "
+    "3.461c.168-.236.053-.553-.21-.677-.261-.125-.57-.007-.76.213a1.95 1.95 0 1 1 .01-2.54c.187.221.495.342.758.219",
+    "M7.326 5.846c.272.1.578-.04.629-.327a3 3 0 1 0-2.456 "
+    "2.44c.286-.049.428-.354.331-.627-.097-.274-.399-.408-.688-.387a1.95 1.95 0 1 1 1.802-1.79c-.023.29.11.592.382.691",
+    "M6.046 7.243c.122.263.438.38.676.214a3 3 0 1 0-3.461-.012c.236.168.553.053.677-.21.125-.261.006-.57-.213-.76a1.95 "
+    "1.95 0 1 1 2.54.01c-.221.187-.342.495-.22.758",
+    "M4.153 7.326c-.099.272.042.578.327.629a3 3 0 1 0-2.438-2.456c.048.286.353.428.626.331s.408-.399.387-.688a1.95 "
+    "1.95 0 1 1 1.79 1.802c-.29-.023-.592.11-.692.382",
+};
 OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(renderer)
 {
     this->renderer = renderer;
@@ -91,14 +114,14 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            })
                            ->store(precisionNode2))
                ->mount(button)
-               ->mount(button2->mount(std::make_shared<node::OMDemiurgeSvgNode>()->style({
-                   {"width", 20_px},
-                   {"height", 20_px},
-                   {"color", (int)0xffffffff},
-                   {"svgPath", "M4.153 7.326c-.099.272.042.578.327.629a3 3 0 1 "
-                               "0-2.438-2.456c.048.286.353.428.626.331s.408-.399.387-.688a1.95 1.95 0 1 "
-                               "1 1.79 1.802c-.29-.023-.592.11-.692.382"},
-               })));
+               ->mount(button2->mount(std::make_shared<node::OMDemiurgeSvgNode>()
+                                          ->style({
+                                              {"width", 20_px},
+                                              {"height", 20_px},
+                                              {"color", (int)0xffffffff},
+                                              {"svgPath", loadingRing[0]},
+                                          })
+                                          ->store(svgNode)));
 
     internal = std::make_shared<OMDemiurgeRendererHandler>(renderer, node);
     internal->fit = true;
@@ -115,6 +138,7 @@ void OMDebugRenderer::submitTasks()
 void OMDebugRenderer::beforeFrame()
 {
 }
+int i = 0;
 void OMDebugRenderer::afterFrame()
 {
     ++fps;
@@ -134,6 +158,7 @@ void OMDebugRenderer::afterFrame()
 
         tp = std::chrono::steady_clock::now();
         fps = 0;
+        svgNode->style("svgPath", loadingRing[(++i) % 8]);
     }
 
     auto m = camera->getPosRaw();
