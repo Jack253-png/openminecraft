@@ -30,10 +30,9 @@ class OMDemiurgeButton : public OMDemiurgeContainerNode
     void setOnClick(std::function<void()> h);
     void update() override;
 
-    animation::OMAnimationValue<float> opacityAnimated;
+    animation::OMAnimationValue<float> opacity;
 
   private:
-    void updateOpacity();
     std::shared_ptr<OMDemiurgeNode> textNode;
     std::shared_ptr<OMDemiurgeNode> bkgNode;
     std::function<void()> handle = []() -> void {};

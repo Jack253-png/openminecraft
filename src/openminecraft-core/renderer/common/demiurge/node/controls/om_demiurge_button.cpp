@@ -8,16 +8,13 @@
 #include "openminecraft/renderer/common/demiurge/om_demiurge_node.hpp"
 #include <array>
 #include <SDL3/SDL.h>
-#include <chrono>
-#include <iostream>
 #include <memory>
-#include <thread>
 
 using namespace openminecraft::renderer::common::animation;
 
 namespace openminecraft::renderer::common::demiurge::node::controls
 {
-OMDemiurgeButton::OMDemiurgeButton(geom::OMFontSet *fontset) : opacityAnimated(0.6f)
+OMDemiurgeButton::OMDemiurgeButton(geom::OMFontSet *fontset) : opacity(0.6f)
 {
     stylesStorage.put("justifyContent", OMDemiurgeAlign::Center);
     stylesStorage.put("alignItems", OMDemiurgeAlign::Center);
@@ -36,45 +33,38 @@ OMDemiurgeButton::OMDemiurgeButton(geom::OMFontSet *fontset) : opacityAnimated(0
     });
     this->mountDirect(bkgNode);
     this->mountDirect(textNode);
-
-    updateOpacity();
 }
 OMDemiurgeButton::~OMDemiurgeButton() = default;
 void OMDemiurgeButton::update()
 {
-    updateOpacity();
+    bkgNode->style("color", (int)(0xefefef00 | static_cast<uint8_t>(opacity.get() * 255.0f)));
     OMDemiurgeContainerNode::update();
 }
 auto OMDemiurgeButton::processMouseDown(float x, float y, uint8_t button) -> OMDemiurgeEventResult
 {
-    opacityAnimated.animateTo(1.0f, easeOutCirc<float>, 0.2f);
+    opacity.animateTo(1.0f, easeOutCirc<float>, 0.2f);
     return Handled;
 }
 auto OMDemiurgeButton::processMouseUp(float x, float y, uint8_t button) -> OMDemiurgeEventResult
 {
-    opacityAnimated.animateTo(0.8f, easeOutCirc<float>, 0.2f);
+    opacity.animateTo(0.8f, easeOutCirc<float>, 0.2f);
     return Handled;
 }
 
 auto OMDemiurgeButton::processMouseEnter(float x, float y) -> OMDemiurgeEventResult
 {
-    opacityAnimated.animateTo(0.8f, easeOutCirc<float>, 0.2f);
+    opacity.animateTo(0.8f, easeOutCirc<float>, 0.2f);
     return Handled;
 }
 auto OMDemiurgeButton::processMouseExit(float x, float y) -> OMDemiurgeEventResult
 {
-    opacityAnimated.animateTo(0.6f, easeOutCirc<float>, 0.2f);
+    opacity.animateTo(0.6f, easeOutCirc<float>, 0.2f);
     return Handled;
 }
 
 auto OMDemiurgeButton::submit(OMDemiurgeRendererHandler *handler, float depth) -> void
 {
     OMDemiurgeContainerNode::submit(handler, depth);
-}
-
-void OMDemiurgeButton::updateOpacity()
-{
-    bkgNode->style("color", (int)(0xefefef00 | static_cast<uint8_t>(opacityAnimated.get() * 255.0f)));
 }
 
 void OMDemiurgeButton::setText(std::string s)
