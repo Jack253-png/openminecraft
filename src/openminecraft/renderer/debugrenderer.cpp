@@ -52,23 +52,21 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
     button2->setOnClick([]() -> void { std::cout << "button 2 clicked!" << std::endl; });
     node = std::make_shared<node::OMDemiurgeContainerNode>()
                ->style({
-                   {"color", (int)0x23232399},
                    {"flexDirection", Column},
                    {"flexGap", 5_px},
-                   {"radius", glm::vec4(0.0f, 0.0f, 0.0f, 25.0f)},
                    {"width", OMDemiurgeSize::fit()},
                    {"height", OMDemiurgeSize::fit()},
                })
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0xffffffff},
+                               {"color", (int)0x000000ff},
                                {"flexGrow", 1.0f},
                                {"text", "OpenMinecraft Demo"},
                                {"textheight", 16},
                            }))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0xffffffff},
+                               {"color", (int)0x000000ff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -76,7 +74,7 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            ->store(fpsTextNode))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0xffffffff},
+                               {"color", (int)0x000000ff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -84,7 +82,7 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            ->store(posTextNode))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0xffffffff},
+                               {"color", (int)0x000000ff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -92,14 +90,14 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            ->store(povTextNode))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0xffffffff},
+                               {"color", (int)0x000000ff},
                                {"flexGrow", 1.0f},
                                {"text", renderer->driver()},
                                {"textheight", 16},
                            }))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0xffffffff},
+                               {"color", (int)0x000000ff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -107,7 +105,7 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            ->store(precisionNode))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0xffffffff},
+                               {"color", (int)0x000000ff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -118,7 +116,7 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                                           ->style({
                                               {"width", 20_px},
                                               {"height", 20_px},
-                                              {"color", (int)0xffffffff},
+                                              {"color", (int)0x000000ff},
                                               {"svgPath", loadingRing[0]},
                                           })
                                           ->store(svgNode)));

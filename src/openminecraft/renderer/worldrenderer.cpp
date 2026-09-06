@@ -21,6 +21,8 @@
 #include "openminecraft/renderer/common/wrap/om_renderer_voxel.hpp"
 #include "openminecraft/world/om_world_chunkmanager.hpp"
 
+#include <array>
+#include <chrono>
 #include <functional>
 #include <glm/glm.hpp>
 #include <memory>
@@ -105,6 +107,7 @@ class OMWorldColorManager : public wrap::OMVoxelColorManager
     }
 };
 static OMWorldColorManager *colorManager = new OMWorldColorManager;
+static std::chrono::steady_clock::time_point tp = {};
 OMWorldRenderer::OMWorldRenderer(OMRenderer *renderer, std::shared_ptr<basics::OMCamera> camera,
                                  std::shared_ptr<OMChunkManager<16>> chunkManager)
     : OMRendererHandler(renderer), camera(std::move(camera)), logger("OMWorldRenderer", this), renderer(renderer)
@@ -160,16 +163,41 @@ OMWorldRenderer::OMWorldRenderer(OMRenderer *renderer, std::shared_ptr<basics::O
         colorManager);
 
     voxelManager->bindCameraBuffer(cameraBuffer);
+
+    auto simp = basics::OMVertexFormat();
+    simp.nextGroup()->decideStruct();
+    bgPipe =
+        renderer->createPipeline()
+            ->input(UniformBuffer)
+            ->inputName("ScreenData")
+            ->input(UniformBuffer)
+            ->inputName("Time")
+            ->output(tempTarget->target)
+            ->shader(renderer->shaderManager.preprocess("demiurge/scene/scene1.vert.glsl", Vertex, GLSLSource, simp))
+            ->shader(renderer->shaderManager.preprocess("demiurge/scene/scene1.frag.glsl", Fragment, GLSLSource, simp))
+            ->format(simp)
+            ->blend(false)
+            ->depth(false, false)
+            ->buildN();
+    screenSizeBuffer = renderer->allocateBuffer(Uniform, sizeof(float) * 2);
+    timeBuffer = renderer->allocateBuffer(Uniform, sizeof(float));
+
+    bgPipe->bindInput(0, screenSizeBuffer);
+    bgPipe->bindInput(1, timeBuffer);
+    tp = std::chrono::steady_clock::now();
 }
 
 void OMWorldRenderer::beforeFrame()
 {
     voxelManager->update(*camera);
+    timeBuffer->updateData(std::array<float, 1>{
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - tp).count() / 1000.0f}
+                               .data());
 }
 
 void OMWorldRenderer::record()
 {
-    voxelManager->submit(renderer->fetchTask("voxel"), tempTarget)->finishN();
+    voxelManager->submit(renderer->fetchTask("voxel"), tempTarget)->pipeline(bgPipe)->drawN(6)->finishN();
 }
 
 static int gameT = 0;
@@ -178,15 +206,14 @@ void OMWorldRenderer::afterFrame()
 {
     auto cam = camera->fetchProjMat() * camera->fetchViewMat();
     cameraBuffer->updateData(&cam);
-
-    // colorManager->updateGameTime(gameT / 24000.0f);
-    // gameT = (gameT + 1) % 24000;
-    // logger.info("{} tick", gameT);
 }
 
 void OMWorldRenderer::submitTasks()
 {
-    tempTarget->construct(renderer->getExtent());
+    auto siz = renderer->getExtent();
+    tempTarget->construct(siz);
+
+    screenSizeBuffer->updateData(std::array<float, 2>{siz.x, siz.y}.data());
 
     renderer->createTask("voxel");
 
@@ -194,6 +221,10 @@ void OMWorldRenderer::submitTasks()
 }
 OMWorldRenderer::~OMWorldRenderer()
 {
+    delete bgPipe;
+    delete screenSizeBuffer;
+    delete timeBuffer;
+
     delete uniformBuffer;
     delete cameraBuffer;
     delete voxelManager;

@@ -63,6 +63,9 @@ class OMWorldRenderer : public OMRendererHandler
     std::shared_ptr<basics::OMCamera> camera;
     basics::OMVertexFormat format;
 
+    OMRendererPipeline *bgPipe;
+    OMRendererBuffer *screenSizeBuffer, *timeBuffer;
+
     log::OMLogger logger;
 
   private:
