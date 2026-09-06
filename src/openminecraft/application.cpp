@@ -20,6 +20,7 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_video.h>
+#include <array>
 #include <boost/stacktrace/stacktrace.hpp>
 #include "openminecraft/renderer/common/event/om_eventbus.hpp"
 #include <chrono>
@@ -304,7 +305,8 @@ void OMApplication::mainLoop(OMBackend backend)
             hnd2->node->acceptEvent(e.button.x, e.button.y, demiurge::MouseDown, e.button.button);
         });
         bus.append(SDL_EVENT_MOUSE_WHEEL, [&](SDL_Event &e) -> void {
-            hnd2->node->acceptEvent(e.button.x, e.button.y, demiurge::MouseWheel, e.button.button);
+            hnd2->node->acceptEvent(e.wheel.mouse_x, e.wheel.mouse_y, demiurge::MouseWheel, e.button.button,
+                                    std::array<float, 2>{e.wheel.x, e.wheel.y}.data());
         });
         bus.append(SDL_EVENT_KEY_DOWN, [&](SDL_Event &e) -> void {
             hnd2->node->acceptEvent(INFINITY, INFINITY, demiurge::KeyDown, e.key.key);

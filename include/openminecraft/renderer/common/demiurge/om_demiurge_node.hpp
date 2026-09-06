@@ -115,6 +115,10 @@ class OMDemiurgeNode : public std::enable_shared_from_this<OMDemiurgeNode>
     {
         return Ignored;
     }
+    virtual auto processMouseScroll(float x, float y, float wx, float wy) -> OMDemiurgeEventResult
+    {
+        return Ignored;
+    }
     virtual auto processMouseUp(float x, float y, uint8_t button) -> OMDemiurgeEventResult
     {
         return Ignored;

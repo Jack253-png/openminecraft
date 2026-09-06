@@ -13,6 +13,8 @@
 #include <memory>
 #include <thread>
 
+using namespace openminecraft::renderer::common::animation;
+
 namespace openminecraft::renderer::common::demiurge::node::controls
 {
 OMDemiurgeButton::OMDemiurgeButton(geom::OMFontSet *fontset) : opacityAnimated(0.6f)
@@ -45,23 +47,23 @@ void OMDemiurgeButton::update()
 }
 auto OMDemiurgeButton::processMouseDown(float x, float y, uint8_t button) -> OMDemiurgeEventResult
 {
-    opacityAnimated.animateTo(1.0f, animation::easeOutCubic<float>, 0.2f);
+    opacityAnimated.animateTo(1.0f, easeOutCirc<float>, 0.2f);
     return Handled;
 }
 auto OMDemiurgeButton::processMouseUp(float x, float y, uint8_t button) -> OMDemiurgeEventResult
 {
-    opacityAnimated.animateTo(0.8f, animation::easeOutCubic<float>, 0.2f);
+    opacityAnimated.animateTo(0.8f, easeOutCirc<float>, 0.2f);
     return Handled;
 }
 
 auto OMDemiurgeButton::processMouseEnter(float x, float y) -> OMDemiurgeEventResult
 {
-    opacityAnimated.animateTo(0.8f, animation::easeOutCubic<float>, 0.2f);
+    opacityAnimated.animateTo(0.8f, easeOutCirc<float>, 0.2f);
     return Handled;
 }
 auto OMDemiurgeButton::processMouseExit(float x, float y) -> OMDemiurgeEventResult
 {
-    opacityAnimated.animateTo(0.6f, animation::easeOutCubic<float>, 1.0f);
+    opacityAnimated.animateTo(0.6f, easeOutCirc<float>, 0.2f);
     return Handled;
 }
 

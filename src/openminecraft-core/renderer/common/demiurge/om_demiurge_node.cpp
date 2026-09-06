@@ -6,6 +6,7 @@
 #include "yoga/YGValue.h"
 #include <any>
 #include <array>
+#include <cmath>
 #include <iostream>
 
 namespace openminecraft::renderer::common::demiurge
@@ -349,8 +350,16 @@ void OMDemiurgeNode::acceptEvent(float x, float y, OMDemiurgeEventType type, uin
                 result = processMouseUp(x, y, ext);
                 break;
             case MouseEnter:
+                result = processMouseEnter(x, y);
+                break;
             case MouseExit:
-            case MouseWheel:
+                result = processMouseExit(x, y);
+                break;
+            case MouseWheel: {
+                auto f = reinterpret_cast<float *>(data);
+                result = processMouseScroll(x, y, f[0], f[1]);
+                break;
+            }
             case KeyDown:
             case KeyUp:
                 break;
@@ -375,8 +384,11 @@ void OMDemiurgeNode::acceptEvent(float x, float y, OMDemiurgeEventType type, uin
             }
         }
 
-        mx = x;
-        my = y;
+        if (x != INFINITY && y != INFINITY)
+        {
+            mx = x;
+            my = y;
+        }
     }
     catch (std::bad_any_cast &e)
     {
