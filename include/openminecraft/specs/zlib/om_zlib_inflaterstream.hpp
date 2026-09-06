@@ -1,6 +1,7 @@
 #ifndef OM_ZLIB_INFLATERSTREAM_HPP
 #define OM_ZLIB_INFLATERSTREAM_HPP
 
+#include "fmt/format.h"
 #include <ios>
 #include <iostream>
 #include <memory>
@@ -73,7 +74,7 @@ class OMZlibInflateStreamBuf : public std::streambuf
 
             if (ret != Z_OK && ret != Z_STREAM_END)
             {
-                throw std::runtime_error("inflate failed");
+                throw std::runtime_error(fmt::format("inflate failed, {}", ret));
             }
 
             if (strm_.avail_out < outSize)

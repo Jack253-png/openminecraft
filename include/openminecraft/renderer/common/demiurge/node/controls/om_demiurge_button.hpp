@@ -17,6 +17,9 @@ class OMDemiurgeButton : public OMDemiurgeContainerNode
 
     auto submit(OMDemiurgeRendererHandler *handler, float depth) -> void override;
     auto processMouseDown(float x, float y, uint8_t button) -> OMDemiurgeEventResult override;
+    auto processMouseUp(float x, float y, uint8_t button) -> OMDemiurgeEventResult override;
+    auto processMouseEnter(float x, float y) -> OMDemiurgeEventResult override;
+    auto processMouseExit(float x, float y) -> OMDemiurgeEventResult override;
 
     void setText(std::string s);
     void setTextColor(int c);

@@ -7,6 +7,7 @@
 #include "yoga/YGNodeLayout.h"
 #include <algorithm>
 #include <any>
+#include <cmath>
 #include <initializer_list>
 #include <memory>
 #include <string>
@@ -24,6 +25,8 @@ enum OMDemiurgeEventType
     MouseDown,
     MouseUp,
     MouseWheel,
+    MouseEnter,
+    MouseExit,
     KeyDown,
     KeyUp,
 };
@@ -92,6 +95,22 @@ class OMDemiurgeNode : public std::enable_shared_from_this<OMDemiurgeNode>
     {
         return Ignored;
     }
+    virtual auto processMouseMove(float x, float y) -> OMDemiurgeEventResult
+    {
+        return Ignored;
+    }
+    virtual auto processMouseEnter(float x, float y) -> OMDemiurgeEventResult
+    {
+        return Ignored;
+    }
+    virtual auto processMouseExit(float x, float y) -> OMDemiurgeEventResult
+    {
+        return Ignored;
+    }
+    virtual auto processMouseUp(float x, float y, uint8_t button) -> OMDemiurgeEventResult
+    {
+        return Ignored;
+    }
     void acceptEvent(float x, float y, OMDemiurgeEventType type, uint8_t, void * = nullptr);
 
     inline auto style(std::string s, std::any a) -> std::shared_ptr<OMDemiurgeNode>
@@ -110,6 +129,7 @@ class OMDemiurgeNode : public std::enable_shared_from_this<OMDemiurgeNode>
     }
 
   protected:
+    float mx = INFINITY, my = INFINITY;
     OMDemiurgeStyles stylesStorage;
     YGNodeRef yogaNode;
     OMDemiurgeNode *parent = nullptr;

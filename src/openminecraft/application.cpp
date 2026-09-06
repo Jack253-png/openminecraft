@@ -307,10 +307,10 @@ void OMApplication::mainLoop(OMBackend backend)
             hnd2->node->acceptEvent(e.button.x, e.button.y, demiurge::MouseWheel, e.button.button);
         });
         bus.append(SDL_EVENT_KEY_DOWN, [&](SDL_Event &e) -> void {
-            hnd2->node->acceptEvent(e.button.x, e.button.y, demiurge::KeyDown, e.key.key);
+            hnd2->node->acceptEvent(INFINITY, INFINITY, demiurge::KeyDown, e.key.key);
         });
         bus.append(SDL_EVENT_KEY_UP, [&](SDL_Event &e) -> void {
-            hnd2->node->acceptEvent(e.button.x, e.button.y, demiurge::KeyUp, e.key.key);
+            hnd2->node->acceptEvent(INFINITY, INFINITY, demiurge::KeyUp, e.key.key);
         });
 
         util::OMTicker ticker;

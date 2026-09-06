@@ -325,6 +325,17 @@ void OMDemiurgeNode::acceptEvent(float x, float y, OMDemiurgeEventType type, uin
 
         if (x >= bo.x && x <= bo.x + bo.width && y >= bo.y && y <= bo.y + bo.height)
         {
+            if (!(mx >= bo.x && mx <= bo.x + bo.width && my >= bo.y && my <= bo.y + bo.height))
+            {
+                if (processMouseEnter(x, y) == Ignored)
+                {
+                    for (auto f : children)
+                    {
+                        f->acceptEvent(x, y, MouseEnter, ext, data);
+                    }
+                }
+            }
+
             OMDemiurgeEventResult result = Ignored;
             switch (type)
             {
@@ -332,7 +343,13 @@ void OMDemiurgeNode::acceptEvent(float x, float y, OMDemiurgeEventType type, uin
                 result = processMouseDown(x, y, ext);
                 break;
             case MouseMove:
+                result = processMouseMove(x, y);
+                break;
             case MouseUp:
+                result = processMouseUp(x, y, ext);
+                break;
+            case MouseEnter:
+            case MouseExit:
             case MouseWheel:
             case KeyDown:
             case KeyUp:
@@ -347,6 +364,19 @@ void OMDemiurgeNode::acceptEvent(float x, float y, OMDemiurgeEventType type, uin
                 }
             }
         }
+        else if (mx >= bo.x && mx <= bo.x + bo.width && my >= bo.y && my <= bo.y + bo.height)
+        {
+            if (processMouseExit(x, y) == Ignored)
+            {
+                for (auto f : children)
+                {
+                    f->acceptEvent(x, y, MouseExit, ext, data);
+                }
+            }
+        }
+
+        mx = x;
+        my = y;
     }
     catch (std::bad_any_cast &e)
     {

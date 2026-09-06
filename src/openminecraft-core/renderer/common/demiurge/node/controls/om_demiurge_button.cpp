@@ -7,6 +7,7 @@
 #include "openminecraft/renderer/common/demiurge/om_demiurge_node.hpp"
 #include <array>
 #include <SDL3/SDL.h>
+#include <iostream>
 #include <memory>
 
 namespace openminecraft::renderer::common::demiurge::node::controls
@@ -36,7 +37,24 @@ OMDemiurgeButton::~OMDemiurgeButton() = default;
 
 auto OMDemiurgeButton::processMouseDown(float x, float y, uint8_t button) -> OMDemiurgeEventResult
 {
+    bkgNode->style("color", 0xefefefff);
+    return Handled;
+}
+auto OMDemiurgeButton::processMouseUp(float x, float y, uint8_t button) -> OMDemiurgeEventResult
+{
+    bkgNode->style("color", 0xefefefbb);
     handle();
+    return Handled;
+}
+
+auto OMDemiurgeButton::processMouseEnter(float x, float y) -> OMDemiurgeEventResult
+{
+    bkgNode->style("color", 0xefefefbb);
+    return Handled;
+}
+auto OMDemiurgeButton::processMouseExit(float x, float y) -> OMDemiurgeEventResult
+{
+    bkgNode->style("color", 0xefefef88);
     return Handled;
 }
 
