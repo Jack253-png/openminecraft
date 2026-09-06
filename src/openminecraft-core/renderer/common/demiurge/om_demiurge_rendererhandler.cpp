@@ -44,18 +44,6 @@ OMDemiurgeRendererHandler::OMDemiurgeRendererHandler(OMRenderer *renderer, std::
     sector.init(uniformBuffer, middleTarget->target);
     clipRect.init(uniformBuffer, middleTarget->target);
     svg.init(uniformBuffer, middleTarget->target);
-
-    int gly = svg.storeGlyph("M4.153 7.326c-.099.272.042.578.327.629a3 3 0 1 "
-                             "0-2.438-2.456c.048.286.353.428.626.331s.408-.399.387-.688a1.95 1.95 0 1 "
-                             "1 1.79 1.802c-.29-.023-.592.11-.692.382",
-                             glm::vec2(10.0f, 10.0f));
-    int act = svg.request(0.1);
-    auto temp = svg.temporary(act);
-    temp->position = {20.0f, 20.0f, 20.0f, 20.0f};
-    temp->color = glm::vec4(1.0f);
-    temp->depth = 0.1f;
-    temp->factor = 0.01f;
-    temp->glyphId = gly;
 }
 
 OMDemiurgeRendererHandler::~OMDemiurgeRendererHandler()

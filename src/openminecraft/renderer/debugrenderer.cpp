@@ -2,6 +2,7 @@
 #include "openminecraft/renderer/common/demiurge/node/controls/om_demiurge_button.hpp"
 #include "openminecraft/renderer/common/demiurge/node/om_demiurge_cliprect.hpp"
 #include "openminecraft/renderer/common/demiurge/node/om_demiurge_container.hpp"
+#include "openminecraft/renderer/common/demiurge/node/om_demiurge_svg.hpp"
 #include "openminecraft/renderer/common/demiurge/node/om_demiurge_textsdf.hpp"
 #include "openminecraft/vfs/om_vfs_base.hpp"
 #include <iostream>
@@ -90,7 +91,14 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            })
                            ->store(precisionNode2))
                ->mount(button)
-               ->mount(button2);
+               ->mount(button2->mount(std::make_shared<node::OMDemiurgeSvgNode>()->style({
+                   {"width", 20_px},
+                   {"height", 20_px},
+                   {"color", (int)0xffffffff},
+                   {"svgPath", "M4.153 7.326c-.099.272.042.578.327.629a3 3 0 1 "
+                               "0-2.438-2.456c.048.286.353.428.626.331s.408-.399.387-.688a1.95 1.95 0 1 "
+                               "1 1.79 1.802c-.29-.023-.592.11-.692.382"},
+               })));
 
     internal = std::make_shared<OMDemiurgeRendererHandler>(renderer, node);
     internal->fit = true;
