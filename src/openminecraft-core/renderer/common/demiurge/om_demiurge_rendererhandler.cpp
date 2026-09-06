@@ -118,6 +118,7 @@ void OMDemiurgeRendererHandler::beforeFrame()
 
     node->layout(fit ? YGUndefined : ext.x, fit ? YGUndefined : ext.y);
     node->submit(this, bottomDepth);
+    node->update();
 
     rect.update();
     roundedRect.update();

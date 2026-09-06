@@ -3,8 +3,10 @@
 
 #include "glm/fwd.hpp"
 #include "openminecraft/geom/om_fontset.hpp"
+#include "openminecraft/renderer/common/animation/om_animation_value.hpp"
 #include "openminecraft/renderer/common/demiurge/node/om_demiurge_container.hpp"
 #include "openminecraft/renderer/common/demiurge/om_demiurge_node.hpp"
+#include <chrono>
 #include <functional>
 #include <memory>
 namespace openminecraft::renderer::common::demiurge::node::controls
@@ -26,8 +28,12 @@ class OMDemiurgeButton : public OMDemiurgeContainerNode
     void setBackgroundColor(int c);
     void setBackgroundRadius(glm::vec4 r);
     void setOnClick(std::function<void()> h);
+    void update() override;
+
+    animation::OMAnimationValue<float> opacityAnimated;
 
   private:
+    void updateOpacity();
     std::shared_ptr<OMDemiurgeNode> textNode;
     std::shared_ptr<OMDemiurgeNode> bkgNode;
     std::function<void()> handle = []() -> void {};
