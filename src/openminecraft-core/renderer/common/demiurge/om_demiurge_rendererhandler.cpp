@@ -28,7 +28,7 @@ OMDemiurgeRendererHandler::OMDemiurgeRendererHandler(OMRenderer *renderer, std::
     : OMRendererHandler(renderer), renderer(renderer), rect(renderer, [&]() -> void { recordTask(); }),
       roundedRect(renderer, [&]() -> void { recordTask(); }), image(renderer, [&]() -> void { recordTask(); }),
       sector(renderer, [&]() -> void { recordTask(); }), clipRect(renderer, [&]() -> void { recordTask(); }),
-      logger("OMDemiurgeRendererHandler", this)
+      svg(renderer, [&]() -> void { recordTask(); }), logger("OMDemiurgeRendererHandler", this)
 {
     node = n;
 
@@ -43,44 +43,29 @@ OMDemiurgeRendererHandler::OMDemiurgeRendererHandler(OMRenderer *renderer, std::
     image.init(uniformBuffer, middleTarget->target);
     sector.init(uniformBuffer, middleTarget->target);
     clipRect.init(uniformBuffer, middleTarget->target);
+    svg.init(uniformBuffer, middleTarget->target);
 
-    auto comp =
-        openminecraft::geom::svg::compile(openminecraft::geom::svg::mergeTo(openminecraft::geom::svg::parseSvgPath(
-                                              "M4.153 7.326c-.099.272.042.578.327.629a3 3 0 1 "
-                                              "0-2.438-2.456c.048.286.353.428.626.331s.408-.399.387-.688a1.95 1.95 0 1 "
-                                              "1 1.79 1.802c-.29-.023-.592.11-.692.382")),
-                                          {10.0f, 10.0f});
-    testBuffer = renderer->allocateBuffer(UniformTexel, 4 * comp.size());
-    testBuffer->updateData(comp.data());
-
-    basics::OMVertexFormat simp;
-    simp.nextGroup()->decideStruct();
-
-    testPipeline =
-        renderer->createPipeline()
-            ->input(UniformTexelBuffer)
-            ->inputName("inSvgData")
-            ->output(middleTarget->target)
-            ->shader(renderer->shaderManager.preprocess("demiurge/svg.frag.glsl", Fragment, GLSLSource, simp))
-            ->shader(renderer->shaderManager.preprocess("demiurge/svg.vert.glsl", Vertex, GLSLSource, simp))
-            ->format(simp)
-            ->blendFunc({SrcAlpha, OneMinusSrcAlpha, One, OneMinusSrcAlpha})
-            ->blend(true)
-            ->depth(true, true)
-            ->buildN();
-    testPipeline->bindInput(0, testBuffer);
+    int gly = svg.storeGlyph("M4.153 7.326c-.099.272.042.578.327.629a3 3 0 1 "
+                             "0-2.438-2.456c.048.286.353.428.626.331s.408-.399.387-.688a1.95 1.95 0 1 "
+                             "1 1.79 1.802c-.29-.023-.592.11-.692.382",
+                             glm::vec2(10.0f, 10.0f));
+    int act = svg.request(0.1);
+    auto temp = svg.temporary(act);
+    temp->position = {20.0f, 20.0f, 20.0f, 20.0f};
+    temp->color = glm::vec4(1.0f);
+    temp->depth = 0.1f;
+    temp->factor = 0.01f;
+    temp->glyphId = gly;
 }
 
 OMDemiurgeRendererHandler::~OMDemiurgeRendererHandler()
 {
-    delete testBuffer;
-    delete testPipeline;
-
     rect.destroy();
     roundedRect.destroy();
     image.destroy();
     sector.destroy();
     clipRect.destroy();
+    svg.destroy();
     for (auto &p : fonts)
     {
         p.second->destroy();
@@ -128,12 +113,12 @@ void OMDemiurgeRendererHandler::recordTask(bool resize)
         image.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         sector.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         clipRect.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
+        svg.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         for (auto &p : fonts)
         {
             p.second->submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         }
     }
-    task->pipeline(testPipeline)->drawN(6);
     task->finish();
     if (!resize)
     {
@@ -153,6 +138,7 @@ void OMDemiurgeRendererHandler::beforeFrame()
     image.update();
     sector.update();
     clipRect.update();
+    svg.update();
     for (auto &p : fonts)
     {
         p.second->update();

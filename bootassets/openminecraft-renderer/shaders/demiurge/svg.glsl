@@ -1,16 +1,34 @@
 #include "basics/texelbuf.glsl"
 
-uniform samplerBuffer inSvgData;
+uniform ScreenData
+{
+    float width;
+    float height;
+}
+ubo;
+uniform samplerBuffer SvgData;
 
 #ifdef VERTEX_SHADER
 #include "basics/vertexgen.glsl"
+#include "basics/geometry.glsl"
+
+#vertex
 
 layout(location = 0) out vec2 svgGlyphPos;
+layout(location = 1) flat out int svgIndex;
+layout(location = 2) out vec4 svgColor;
+layout(location = 3) flat out float svgFactor;
 
 void main()
 {
-    svgGlyphPos = vertexgen_quad_normal() * vec2(1.0, -1.0) + vec2(0.0, 1.0);
-    gl_Position = vec4(vertexgen_quad_normal() * vec2(0.25), 0.9, 1.0);
+    vec2 inPosition = vertexgen_quad_normal();
+    vec2 screenPos = inSvgPos.xy - vec2(10) + inPosition.xy * (inSvgPos.zw + vec2(20));
+
+    svgGlyphPos = inPosition;
+    svgIndex = inSvgGlyphId;
+    svgColor = inSvgColor;
+    svgFactor = inSvgFactor;
+    gl_Position = vec4(geom_toNdc(screenPos, ubo.width, ubo.height), inSvgDepth, 1.0);
 }
 #endif
 
@@ -18,12 +36,18 @@ void main()
 #include "basics/sdf/sdf_text.glsl"
 
 layout(location = 0) in vec2 svgGlyphPos;
+layout(location = 1) flat in int svgIndex;
+layout(location = 2) in vec4 svgColor;
+layout(location = 3) flat in float svgFactor;
+
 layout(location = 0) out vec4 outColor;
 
 void main()
 {
-    int idx = 0;
-    int outlineCount = int(texelFetchF(inSvgData, (idx)));
+    float unused = ubo.width;
+
+    int idx = svgIndex;
+    int outlineCount = int(texelFetchF(SvgData, (idx)));
     idx++;
 
     float minDist = 1e308;
@@ -31,22 +55,22 @@ void main()
     bool evenodd = false;
     for (int i = 0; i < outlineCount; i++)
     {
-        vec2 start = vec2(texelFetchF(inSvgData, (idx)), texelFetchF(inSvgData, (idx + 1)));
+        vec2 start = vec2(texelFetchF(SvgData, (idx)), texelFetchF(SvgData, (idx + 1)));
         minDist = min(minDist, distance(svgGlyphPos, start));
         idx += 2;
 
-        int curveCount = int(texelFetchF(inSvgData, (idx)));
+        int curveCount = int(texelFetchF(SvgData, (idx)));
         idx++;
 
         vec2 pointer = start;
         for (int j = 0; j < curveCount; j++)
         {
-            float curType = texelFetchF(inSvgData, (idx));
+            float curType = texelFetchF(SvgData, (idx));
             idx++;
 
             if (curType == 0.0)
             {
-                vec2 target = vec2(texelFetchF(inSvgData, (idx)), texelFetchF(inSvgData, (idx + 1)));
+                vec2 target = vec2(texelFetchF(SvgData, (idx)), texelFetchF(SvgData, (idx + 1)));
                 minDist = min(minDist, sdf_distanceToLineSegment(svgGlyphPos, pointer, target));
 
                 float t;
@@ -68,8 +92,8 @@ void main()
             }
             else if (curType == 1.0)
             {
-                vec2 target = vec2(texelFetchF(inSvgData, (idx)), texelFetchF(inSvgData, (idx + 1)));
-                vec2 control = vec2(texelFetchF(inSvgData, (idx + 2)), texelFetchF(inSvgData, (idx + 3)));
+                vec2 target = vec2(texelFetchF(SvgData, (idx)), texelFetchF(SvgData, (idx + 1)));
+                vec2 control = vec2(texelFetchF(SvgData, (idx + 2)), texelFetchF(SvgData, (idx + 3)));
                 minDist = min(minDist, sdf_distanceToQuadraticBezier(svgGlyphPos, pointer, control, target));
                 float t1, t2;
                 int hits = sdf_intersectQuadraticY(svgGlyphPos.y, pointer, control, target, t1, t2);
@@ -91,9 +115,9 @@ void main()
             }
             else if (curType == 2.0)
             {
-                vec2 target = vec2(texelFetchF(inSvgData, (idx)), texelFetchF(inSvgData, (idx + 1)));
-                vec2 control1 = vec2(texelFetchF(inSvgData, (idx + 2)), texelFetchF(inSvgData, (idx + 3)));
-                vec2 control2 = vec2(texelFetchF(inSvgData, (idx + 4)), texelFetchF(inSvgData, (idx + 5)));
+                vec2 target = vec2(texelFetchF(SvgData, (idx)), texelFetchF(SvgData, (idx + 1)));
+                vec2 control1 = vec2(texelFetchF(SvgData, (idx + 2)), texelFetchF(SvgData, (idx + 3)));
+                vec2 control2 = vec2(texelFetchF(SvgData, (idx + 4)), texelFetchF(SvgData, (idx + 5)));
                 minDist = min(minDist, sdf_distanceToCubicBezier(svgGlyphPos, pointer, control1, control2, target));
                 winding = sdf_windingCubic(svgGlyphPos, pointer, control1, control2, target, winding, evenodd);
                 pointer = target;
@@ -101,11 +125,11 @@ void main()
             }
             else if (curType == 3.0)
             {
-                vec2 target = vec2(texelFetchF(inSvgData, (idx)), texelFetchF(inSvgData, (idx + 1)));
-                float rx = texelFetchF(inSvgData, (idx + 2));
-                float ry = texelFetchF(inSvgData, (idx + 3));
-                float xrot = texelFetchF(inSvgData, (idx + 4));
-                int flgs = int(texelFetchF(inSvgData, (idx + 5)));
+                vec2 target = vec2(texelFetchF(SvgData, (idx)), texelFetchF(SvgData, (idx + 1)));
+                float rx = texelFetchF(SvgData, (idx + 2));
+                float ry = texelFetchF(SvgData, (idx + 3));
+                float xrot = texelFetchF(SvgData, (idx + 4));
+                int flgs = int(texelFetchF(SvgData, (idx + 5)));
                 bool largeArcFlag = bool((flgs >> 1) & 1);
                 bool sweepFlag = bool(flgs & 1);
                 minDist = min(minDist,
@@ -127,6 +151,6 @@ void main()
         minDist = minDist * ((float(winding % 2) - 0.5) * 2);
     }
 
-    outColor = vec4(vec3(1.0), smoothstep(-0.01, 0.01, minDist));
+    outColor = svgColor * smoothstep(-svgFactor, svgFactor, minDist);
 }
 #endif
