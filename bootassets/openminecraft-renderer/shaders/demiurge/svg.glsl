@@ -26,8 +26,9 @@ void main()
     int outlineCount = int(texelFetchF(inSvgData, (idx)));
     idx++;
 
-    float minDist = 1.0;
+    float minDist = 1e308;
     int winding = 0;
+    bool evenodd = false;
     for (int i = 0; i < outlineCount; i++)
     {
         vec2 start = vec2(texelFetchF(inSvgData, (idx)), texelFetchF(inSvgData, (idx + 1)));
@@ -57,7 +58,7 @@ void main()
                         float dydt = target.y - pointer.y;
                         if (abs(dydt) > 1e-5)
                         {
-                            winding += (dydt > 0.0) ? 1 : -1;
+                            winding += (dydt > 0.0 || evenodd) ? 1 : -1;
                         }
                     }
                 }
@@ -81,7 +82,7 @@ void main()
                         float dydt = sdf_derivativeQuadraticY(t, pointer, control, target);
                         if (abs(dydt) > 1e-5)
                         {
-                            winding += (dydt > 0.0) ? 1 : -1;
+                            winding += (dydt > 0.0 || evenodd) ? 1 : -1;
                         }
                     }
                 }
@@ -94,7 +95,7 @@ void main()
                 vec2 control1 = vec2(texelFetchF(inSvgData, (idx + 2)), texelFetchF(inSvgData, (idx + 3)));
                 vec2 control2 = vec2(texelFetchF(inSvgData, (idx + 4)), texelFetchF(inSvgData, (idx + 5)));
                 minDist = min(minDist, sdf_distanceToCubicBezier(svgGlyphPos, pointer, control1, control2, target));
-                winding = sdf_windingCubic(svgGlyphPos, pointer, control1, control2, target, winding);
+                winding = sdf_windingCubic(svgGlyphPos, pointer, control1, control2, target, winding, evenodd);
                 pointer = target;
                 idx += 6;
             }
@@ -109,15 +110,23 @@ void main()
                 bool sweepFlag = bool(flgs & 1);
                 minDist = min(minDist,
                               sdf_distanceToArc(svgGlyphPos, pointer, target, rx, ry, xrot, largeArcFlag, sweepFlag));
-                winding = sdf_windingArc(svgGlyphPos, pointer, target, rx, ry, xrot, largeArcFlag, sweepFlag, winding);
+                winding = sdf_windingArc(svgGlyphPos, pointer, target, rx, ry, xrot, largeArcFlag, sweepFlag, winding,
+                                         evenodd);
                 pointer = target;
                 idx += 6;
             }
         }
     }
 
-    minDist = minDist * (2.0 * step(0.5, abs(float(winding))) - 1.0);
+    if (!evenodd)
+    {
+        minDist = minDist * (2.0 * step(0.5, abs(float(winding))) - 1.0);
+    }
+    else
+    {
+        minDist = minDist * ((float(winding % 2) - 0.5) * 2);
+    }
 
-    outColor = vec4(vec3(1.0), smoothstep(-0.005, 0.005, minDist));
+    outColor = vec4(vec3(1.0), smoothstep(-0.01, 0.01, minDist));
 }
 #endif

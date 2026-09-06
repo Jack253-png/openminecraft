@@ -123,11 +123,11 @@ void OMDemiurgeRendererHandler::recordTask(bool resize)
 
     for (float layer = bottomDepth; layer >= topDepth; layer -= 0.01f)
     {
-        clipRect.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         rect.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         roundedRect.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         image.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         sector.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
+        clipRect.submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);
         for (auto &p : fonts)
         {
             p.second->submitTask(task, layer + layerHalfWidth, layer - layerHalfWidth);

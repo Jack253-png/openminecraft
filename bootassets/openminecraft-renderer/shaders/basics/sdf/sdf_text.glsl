@@ -205,7 +205,7 @@ float sdf_distanceToArc(vec2 p, vec2 start, vec2 end, float rx, float ry, float 
     return d;
 }
 
-int sdf_windingCubic(vec2 p, vec2 p0, vec2 p1, vec2 p2, vec2 p3, int winding)
+int sdf_windingCubic(vec2 p, vec2 p0, vec2 p1, vec2 p2, vec2 p3, int winding, bool evenodd)
 {
     vec2 prev = p0;
     for (int i = 1; i <= SEGS; ++i)
@@ -221,7 +221,7 @@ int sdf_windingCubic(vec2 p, vec2 p0, vec2 p1, vec2 p2, vec2 p3, int winding)
                 float dy = cur.y - prev.y;
                 if (abs(dy) > 1e-5)
                 {
-                    winding += (dy > 0.0) ? 1 : -1;
+                    winding += (dy > 0.0 || evenodd) ? 1 : -1;
                 }
             }
         }
@@ -231,7 +231,7 @@ int sdf_windingCubic(vec2 p, vec2 p0, vec2 p1, vec2 p2, vec2 p3, int winding)
 }
 
 int sdf_windingArc(vec2 p, vec2 start, vec2 end, float rx, float ry, float xrotDeg, bool largeArc, bool sweep,
-                   int winding)
+                   int winding, bool evenodd)
 {
     if (rx < 1e-6 || ry < 1e-6)
     {
@@ -243,7 +243,7 @@ int sdf_windingArc(vec2 p, vec2 start, vec2 end, float rx, float ry, float xrotD
             {
                 float dy = end.y - start.y;
                 if (abs(dy) > 1e-5)
-                    winding += (dy > 0.0) ? 1 : -1;
+                    winding += (dy > 0.0 || evenodd) ? 1 : -1;
             }
         }
         return winding;
@@ -303,7 +303,7 @@ int sdf_windingArc(vec2 p, vec2 start, vec2 end, float rx, float ry, float xrotD
             {
                 float dy = cur.y - prev.y;
                 if (abs(dy) > 1e-5)
-                    winding += (dy > 0.0) ? 1 : -1;
+                    winding += (dy > 0.0 || evenodd) ? 1 : -1;
             }
         }
         prev = cur;

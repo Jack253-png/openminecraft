@@ -19,7 +19,7 @@ void main()
     vec2 inPosition = vertexgen_quad_normal();
     vec2 screenPos = inPosition.xy * vec2(ubo.width, ubo.height);
 
-    gl_Position = vec4(geom_toNdc(screenPos, ubo.width, ubo.height), inRectDepth - 0.1, 1.0);
+    gl_Position = vec4(geom_toNdc(screenPos, ubo.width, ubo.height), 0.0, 1.0);
     rectPos = inRectPos;
     targetScreenPos = screenPos;
 }
