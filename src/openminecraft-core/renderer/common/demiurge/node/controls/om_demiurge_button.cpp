@@ -25,8 +25,6 @@ OMDemiurgeButton::OMDemiurgeButton(geom::OMFontSet *fontset) : opacity(0.6f)
         {"height", 100_percent},
     });
     textNode = std::make_shared<OMDemiurgeTextSdfNode>(fontset)->style({
-        {"text", "Button"},
-        {"textheight", 16},
         {"color", 0x000000ff},
         {"alignSelf", OMDemiurgeAlign::Center},
         {"margin", std::array<OMDemiurgeSize, 4>{5_px, 10_px, 5_px, 5_px}},
@@ -38,27 +36,33 @@ OMDemiurgeButton::~OMDemiurgeButton() = default;
 void OMDemiurgeButton::update()
 {
     bkgNode->style("color", (int)(0xefefef00 | static_cast<uint8_t>(opacity.get() * 255.0f)));
+    textNode->style("text", stylesStorage.get<std::string>("label", "Button"));
+    textNode->style("textheight", stylesStorage.get<int>("textheight", 16));
     OMDemiurgeContainerNode::update();
 }
 auto OMDemiurgeButton::processMouseDown(float x, float y, uint8_t button) -> OMDemiurgeEventResult
 {
-    opacity.animateTo(1.0f, easeOutCirc<float>, 0.2f);
+    opacity.animateTo(stylesStorage.get<float>("opacity_clicked", 1.0f), easeOutCirc<float>,
+                      stylesStorage.get<float>("animation_speed", 0.2f));
     return Handled;
 }
 auto OMDemiurgeButton::processMouseUp(float x, float y, uint8_t button) -> OMDemiurgeEventResult
 {
-    opacity.animateTo(0.8f, easeOutCirc<float>, 0.2f);
+    opacity.animateTo(stylesStorage.get<float>("opacity_hovered", 0.8f), easeOutCirc<float>,
+                      stylesStorage.get<float>("animation_speed", 0.2f));
     return Handled;
 }
 
 auto OMDemiurgeButton::processMouseEnter(float x, float y) -> OMDemiurgeEventResult
 {
-    opacity.animateTo(0.8f, easeOutCirc<float>, 0.2f);
+    opacity.animateTo(stylesStorage.get<float>("opacity_hovered", 0.8f), easeOutCirc<float>,
+                      stylesStorage.get<float>("animation_speed", 0.2f));
     return Handled;
 }
 auto OMDemiurgeButton::processMouseExit(float x, float y) -> OMDemiurgeEventResult
 {
-    opacity.animateTo(0.6f, easeOutCirc<float>, 0.2f);
+    opacity.animateTo(stylesStorage.get<float>("opacity_normal", 0.6f), easeOutCirc<float>,
+                      stylesStorage.get<float>("animation_speed", 0.2f));
     return Handled;
 }
 

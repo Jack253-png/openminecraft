@@ -113,15 +113,17 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                                {"textheight", 16},
                            })
                            ->store(precisionNode2))
-               ->mount(button)
-               ->mount(button2->mount(std::make_shared<node::OMDemiurgeSvgNode>()
-                                          ->style({
-                                              {"width", 20_px},
-                                              {"height", 20_px},
-                                              {"color", (int)0x000000ff},
-                                              {"svgPath", loadingRing[0]},
-                                          })
-                                          ->store(svgNode)));
+               ->mount(button->style("animation_speed", 1.0f))
+               ->mount(button2
+                           ->mount(std::make_shared<node::OMDemiurgeSvgNode>()
+                                       ->style({
+                                           {"width", 20_px},
+                                           {"height", 20_px},
+                                           {"color", (int)0x000000ff},
+                                           {"svgPath", loadingRing[0]},
+                                       })
+                                       ->store(svgNode))
+                           ->style("label", ""));
 
     internal = std::make_shared<OMDemiurgeRendererHandler>(renderer, node);
     internal->fit = true;
