@@ -9,14 +9,6 @@
 #include <functional>
 #include <memory>
 
-// INFO: simple button control
-// style key names
-// label => the text content of the button
-// textheight => text height in pixels
-// animation_speed => any animation length in secs
-// opacity_normal => the opacity of the button
-// opacity_hovered => the opacity of the button when it is hovered
-// opacity_clicked => the opacity of the button when it is clicked
 namespace openminecraft::renderer::common::demiurge::node::controls
 {
 class OMDemiurgeButton : public OMDemiurgeContainerNode

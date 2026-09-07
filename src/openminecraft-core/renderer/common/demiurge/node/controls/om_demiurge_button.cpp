@@ -19,7 +19,6 @@ OMDemiurgeButton::OMDemiurgeButton(geom::OMFontSet *fontset) : opacity(0.6f)
     stylesStorage.put("justifyContent", OMDemiurgeAlign::Center);
     stylesStorage.put("alignItems", OMDemiurgeAlign::Center);
     bkgNode = std::make_shared<OMDemiurgeRectNode>()->style({
-        {"radius", glm::vec4(20.0f)},
         {"position", Absolute},
         {"width", 100_percent},
         {"height", 100_percent},
@@ -36,6 +35,7 @@ OMDemiurgeButton::~OMDemiurgeButton() = default;
 void OMDemiurgeButton::update()
 {
     bkgNode->style("color", (int)(0xefefef00 | static_cast<uint8_t>(opacity.get() * 255.0f)));
+    bkgNode->style("radius", stylesStorage.get<glm::vec4>("radius", glm::vec4(5.0f)));
     textNode->style("text", stylesStorage.get<std::string>("label", "Button"));
     textNode->style("textheight", stylesStorage.get<int>("textheight", 16));
     OMDemiurgeContainerNode::update();
