@@ -346,7 +346,7 @@ auto OMVoxelManager::updateColor() -> void
 {
     if (colorManager->isDirty())
     {
-        OMVoxelSkyDisc disc = {colorManager->getSkyColor(), 256, colorManager->getSkyDiscColor(), 16};
+        OMVoxelSkyDisc disc = {colorManager->getSkyDiscColor(), 256, colorManager->getFogColor(), 16};
         skydisc->updateData(&disc);
         auto fg = colorManager->getFogColor();
         std::array<float, 5> d = {colorManager->getFogRange().x, colorManager->getFogRange().y, fg.r, fg.g, fg.b};

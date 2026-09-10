@@ -399,7 +399,6 @@ class OMVoxelColorManager
     {
     }
 
-    virtual auto getSkyColor() -> glm::vec3 = 0;
     virtual auto getSkyDiscColor() -> glm::vec3 = 0;
     virtual auto getSkyDiskRange() -> float = 0;
     virtual auto getSkyDiskHeight() -> float = 0;

@@ -41,13 +41,9 @@ class OMWorldColorManager : public wrap::OMVoxelColorManager
         gameTime = glm::clamp(v, 0.0f, 1.0f);
         dirty = true;
     }
-    auto getSkyColor() -> glm::vec3 override
-    {
-        return glm::mix(glm::vec3{0.02, 0.03, 0.14}, glm::vec3{0.198, 0.371, 1.0}, gameTime);
-    }
     auto getSkyDiscColor() -> glm::vec3 override
     {
-        return glm::mix(glm::vec3{0.02, 0.02, 0.06}, glm::vec3{0.470, 0.654, 1.0}, gameTime);
+        return glm::mix(glm::vec3(0.0), glm::vec3(0.4706, 0.6549, 1.0), gameTime);
     }
     auto getSkyDiskRange() -> float override
     {
@@ -67,7 +63,7 @@ class OMWorldColorManager : public wrap::OMVoxelColorManager
     }
     auto getSkyLightColor() -> glm::vec3 override
     {
-        return glm::mix(glm::vec3{0.02, 0.03, 0.14}, glm::vec3{0.9, 0.95, 1.0}, gameTime);
+        return glm::mix(glm::vec3(0.48f, 0.48f, 1.0f), glm::vec3(1.0), gameTime);
     }
     auto getAmbientColor() -> glm::vec3 override
     {
@@ -83,7 +79,7 @@ class OMWorldColorManager : public wrap::OMVoxelColorManager
     }
     auto getSkyFactor() -> float override
     {
-        return 1.0f;
+        return glm::mix(0.24f, 1.0f, gameTime);
     }
     auto getNightVisionFactor() -> float override
     {
@@ -103,7 +99,7 @@ class OMWorldColorManager : public wrap::OMVoxelColorManager
     }
     auto getFogColor() -> glm::vec3 override
     {
-        return glm::vec3{0.752, 0.84, 1.0} * glm::mix(0.1f, 1.0f, gameTime);
+        return glm::vec3(0.7529, 0.8471, 1.0) * glm::mix(glm::vec3(0.05, 0.05, 0.09), glm::vec3(1.0), gameTime);
     }
 };
 static OMWorldColorManager *colorManager = new OMWorldColorManager;
@@ -151,7 +147,7 @@ OMWorldRenderer::OMWorldRenderer(OMRenderer *renderer, std::shared_ptr<basics::O
     }
     textureAtlas->build();
 
-    colorManager->updateGameTime(1.0);
+    // colorManager->updateGameTime(1.0);
     voxelManager = new wrap::OMVoxelManager(
         renderer, tempTarget->target, textureAtlas->texture, textureAtlas->textureSecondary, chunkManager,
         [&]() -> void { record(); }, this->voxelHandler,
