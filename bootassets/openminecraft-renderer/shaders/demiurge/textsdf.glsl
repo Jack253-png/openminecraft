@@ -175,6 +175,6 @@ void main()
     minDist = minDist * (2.0 * step(0.5, abs(float(winding))) - 1.0);
 
     float actualFactor = smoothstep(-textFactor, textFactor, minDist);
-    outColor = textColor * actualFactor;
+    outColor = vec4(textColor.rgb, textColor.a * actualFactor);
 }
 #endif
