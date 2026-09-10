@@ -24,7 +24,7 @@ OMDemiurgeButton::OMDemiurgeButton(geom::OMFontSet *fontset) : opacity(0.6f)
         {"height", 100_percent},
     });
     textNode = std::make_shared<OMDemiurgeTextSdfNode>(fontset)->style({
-        {"color", 0x000000ff},
+        {"color", 0xffffffff},
         {"alignSelf", OMDemiurgeAlign::Center},
         {"margin", std::array<OMDemiurgeSize, 4>{5_px, 10_px, 5_px, 5_px}},
     });
@@ -34,7 +34,7 @@ OMDemiurgeButton::OMDemiurgeButton(geom::OMFontSet *fontset) : opacity(0.6f)
 OMDemiurgeButton::~OMDemiurgeButton() = default;
 void OMDemiurgeButton::update()
 {
-    bkgNode->style("color", (int)(0xefefef00 | static_cast<uint8_t>(opacity.get() * 255.0f)));
+    bkgNode->style("color", (int)(0x23232300 | static_cast<uint8_t>(opacity.get() * 255.0f)));
     bkgNode->style("radius", stylesStorage.get<glm::vec4>("radius", glm::vec4(5.0f)));
     textNode->style("text", stylesStorage.get<std::string>("label", "Button"));
     textNode->style("textheight", stylesStorage.get<int>("textheight", 16));

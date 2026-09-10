@@ -61,14 +61,14 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                })
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0x000000ff},
+                               {"color", (int)0xffffffff},
                                {"flexGrow", 1.0f},
                                {"text", "OpenMinecraft Demo"},
                                {"textheight", 16},
                            }))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0x000000ff},
+                               {"color", (int)0xffffffff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -76,7 +76,7 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            ->store(fpsTextNode))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0x000000ff},
+                               {"color", (int)0xffffffff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -84,7 +84,7 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            ->store(posTextNode))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0x000000ff},
+                               {"color", (int)0xffffffff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -92,14 +92,14 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            ->store(povTextNode))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0x000000ff},
+                               {"color", (int)0xffffffff},
                                {"flexGrow", 1.0f},
                                {"text", renderer->driver()},
                                {"textheight", 16},
                            }))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0x000000ff},
+                               {"color", (int)0xffffffff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -107,7 +107,7 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                            ->store(precisionNode))
                ->mount(std::make_shared<node::OMDemiurgeTextSdfNode>(fontset.get())
                            ->style({
-                               {"color", (int)0x000000ff},
+                               {"color", (int)0xffffffff},
                                {"flexGrow", 1.0f},
                                {"text", ""},
                                {"textheight", 16},
@@ -119,7 +119,7 @@ OMDebugRenderer::OMDebugRenderer(OMRenderer *renderer) : OMRendererHandler(rende
                                        ->style({
                                            {"width", 20_px},
                                            {"height", 20_px},
-                                           {"color", (int)0x000000ff},
+                                           {"color", (int)0xffffffff},
                                            {"svgPath", loadingRing[0]},
                                        })
                                        ->store(svgNode))

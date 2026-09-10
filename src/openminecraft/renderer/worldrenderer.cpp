@@ -197,7 +197,10 @@ void OMWorldRenderer::beforeFrame()
 
 void OMWorldRenderer::record()
 {
-    voxelManager->submit(renderer->fetchTask("voxel"), tempTarget)->pipeline(bgPipe)->drawN(6)->finishN();
+    voxelManager
+        ->submit(renderer->fetchTask("voxel"), tempTarget)
+        // ->pipeline(bgPipe)->drawN(6)
+        ->finishN();
 }
 
 static int gameT = 0;
