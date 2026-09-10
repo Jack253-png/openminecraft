@@ -228,6 +228,11 @@ template <typename T> auto easeBezier(T x, T p1x, T p1y, T p2x, T p2y) -> T
     return static_cast<T>(y);
 }
 
+template <typename T> auto symmetricEaseBezier(T x, T px, T py) -> T
+{
+    return easeBezier(x, px, py, 1.0f - px, 1.0f - py);
+}
+
 } // namespace openminecraft::renderer::common::animation
 
 #endif
