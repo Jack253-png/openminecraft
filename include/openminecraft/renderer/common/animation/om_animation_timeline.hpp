@@ -1,0 +1,4 @@
+#ifndef OM_ANIMATION_TIMELINE_HPP
+#define OM_ANIMATION_TIMELINE_HPP
+
+#endif
