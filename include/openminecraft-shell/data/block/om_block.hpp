@@ -2,13 +2,11 @@
 #define OM_BLOCK_HPP
 
 #include "openminecraft-shell/data/block/om_blockstate.hpp"
+#include "openminecraft-shell/data/block/om_blockstate_registry.hpp"
 #include "openminecraft-shell/data/om_identifier.hpp"
-#include "openminecraft/io/json/om_io_ast_json.hpp"
+#include "openminecraft/renderer/common/wrap/om_renderer_voxel.hpp"
 #include <initializer_list>
-#include <memory>
-#include <sys/unistd.h>
 #include <unordered_map>
-#include <utility>
 namespace openminecraftshell::data::block
 {
 struct OMBlockModelIdentifier
@@ -45,6 +43,7 @@ template <> struct hash<openminecraftshell::data::block::OMBlockModelIdentifier>
     }
 };
 } // namespace std
+using openminecraft::renderer::common::wrap::OMVoxelFacing;
 namespace openminecraftshell::data::block
 {
 class OMBlock
@@ -62,10 +61,15 @@ class OMBlock
         translucent = v;
         return *this;
     }
-    auto skipsRendering(bool v) -> OMBlock &
+
+    virtual auto skipsRendering(const OMBlockStateCombined &state, const OMBlockStateCombined &other,
+                                OMVoxelFacing direction) -> bool
     {
-        skipRendering = v;
-        return *this;
+        if (state.block == other.block)
+        {
+            return true;
+        }
+        return false;
     }
 
     auto prop(std::string n, std::initializer_list<std::string> values) -> OMBlock &
@@ -116,10 +120,26 @@ class OMBlock
 
     bool soild = true;
     bool translucent = false;
-    bool skipRendering = false;
     std::unordered_map<std::string, std::vector<std::string>> properties;
 
     auto operator=(const OMBlock &other) -> OMBlock & = default;
+};
+
+class OMTransparentBlock : public OMBlock
+{
+  public:
+    OMTransparentBlock() = default;
+    ~OMTransparentBlock() = default;
+
+    auto skipsRendering(const OMBlockStateCombined &state, const OMBlockStateCombined &other, OMVoxelFacing direction)
+        -> bool override
+    {
+        if (state.block == other.block)
+        {
+            return true;
+        }
+        return false;
+    }
 };
 } // namespace openminecraftshell::data::block
 

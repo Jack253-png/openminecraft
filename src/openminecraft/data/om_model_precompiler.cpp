@@ -6,6 +6,8 @@
 #include "fmt/format.h"
 #include "glm/common.hpp"
 #include "glm/fwd.hpp"
+#include "openminecraft-shell/data/block/om_block_registery.hpp"
+#include "openminecraft-shell/data/block/om_blockstate_registry.hpp"
 #include "openminecraft-shell/data/om_identifier.hpp"
 #include "openminecraft/io/json/om_io_ast_builder_json.hpp"
 #include "openminecraft/io/json/om_io_ast_json.hpp"
@@ -64,9 +66,12 @@ static auto fromAxis(std::string s) -> OMModelAxis
         return Z;
     }
 }
-auto OMModelPrecompiler::querySkipsRendering(int bsid) -> bool
+auto OMModelPrecompiler::querySkipsRendering(int bsid, int tgbsid,
+                                             openminecraft::renderer::common::wrap::OMVoxelFacing d) -> bool
 {
-    return blockModels[bsid].skipRendering;
+    const auto &b = block::blockstateRegistry.idToRegistry[bsid];
+    const auto &tb = block::blockstateRegistry.idToRegistry[tgbsid];
+    return block::blockRegistery.getRegistry(b.block).skipsRendering(b, tb, d);
 }
 auto OMModelPrecompiler::queryTranslucent(int bsid) -> bool
 {
@@ -734,7 +739,6 @@ auto OMModelPrecompiler::composeBlock(std::vector<int> partids, bool soild, bool
     auto &m = blockModels.emplace_back();
     m.soild = soild;
     m.translucent = translucent;
-    m.skipRendering = skipsRendering;
     for (auto i : partids)
     {
         for (auto &mp : modelParts[i])

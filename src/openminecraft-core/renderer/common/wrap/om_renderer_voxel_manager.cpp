@@ -152,10 +152,10 @@ OMVoxelManager::OMVoxelManager(OMRenderer *renderer, OMRendererRenderTarget *res
             ->samples(samples)
             ->setCullMode(renderer::common::Back)
             ->setFrontClockwise(true)
-            ->shader(renderer->shaderManager.preprocess("core/voxel/voxel.frag.glsl", Fragment, GLSLSource, format))
+            ->shader(renderer->shaderManager.preprocess("core/voxel/voxel.oit.frag.glsl", Fragment, GLSLSource, format))
             ->shader(renderer->shaderManager.preprocess("core/voxel/voxel.vert.glsl", Vertex, GLSLSource, format))
             ->format(format)
-            ->blendFunc({SrcAlpha, One, Zero, OneMinusSrcAlpha})
+            ->blendFunc({One, One, Zero, OneMinusSrcAlpha})
             ->blend(true)
             ->depth(true, false)
             ->depthOp(GreaterOrEqual)
@@ -177,12 +177,12 @@ OMVoxelManager::OMVoxelManager(OMRenderer *renderer, OMRendererRenderTarget *res
                                      ->samples(samples)
                                      ->setCullMode(renderer::common::Back)
                                      ->setFrontClockwise(true)
-                                     ->shader(renderer->shaderManager.preprocess("core/voxel/voxelcomplex.frag.glsl",
-                                                                                 Fragment, GLSLSource, formatComplex))
+                                     ->shader(renderer->shaderManager.preprocess(
+                                         "core/voxel/voxelcomplex.oit.frag.glsl", Fragment, GLSLSource, formatComplex))
                                      ->shader(renderer->shaderManager.preprocess("core/voxel/voxelcomplex.vert.glsl",
                                                                                  Vertex, GLSLSource, formatComplex))
                                      ->format(formatComplex)
-                                     ->blendFunc({SrcAlpha, One, Zero, OneMinusSrcAlpha})
+                                     ->blendFunc({One, One, Zero, OneMinusSrcAlpha})
                                      ->blend(true)
                                      ->depth(true, false)
                                      ->depthOp(GreaterOrEqual)

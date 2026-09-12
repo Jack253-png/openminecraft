@@ -280,31 +280,34 @@ auto OMVoxelCompiler::checkExistSoild(const world::OMChunk<16> &chunk,
 
 auto OMVoxelCompiler::checkSkip(const world::OMChunk<16> &chunk,
                                 std::function<uint32_t(glm::ivec3, int64_t, int64_t, int64_t)> externalAccessor,
-                                glm::ivec3 v, OMVoxelFacing f, uint32_t id, uint32_t bsid) -> bool
+                                glm::ivec3 v, OMVoxelFacing f, uint32_t id) -> bool
 {
-    if (!handler->querySkipsRendering(bsid))
-    {
-        return false;
-    }
-
+    uint32_t target = 0;
     switch (f)
     {
     default:
     case None:
         return false;
     case NegX:
-        return queryBlockstate(chunk, externalAccessor, v.x - 1, v.y, v.z) == id;
+        target = queryBlockstate(chunk, externalAccessor, v.x - 1, v.y, v.z);
+        break;
     case NegY:
-        return queryBlockstate(chunk, externalAccessor, v.x, v.y - 1, v.z) == id;
+        target = queryBlockstate(chunk, externalAccessor, v.x, v.y - 1, v.z);
+        break;
     case NegZ:
-        return queryBlockstate(chunk, externalAccessor, v.x, v.y, v.z - 1) == id;
+        target = queryBlockstate(chunk, externalAccessor, v.x, v.y, v.z - 1);
+        break;
     case PosX:
-        return queryBlockstate(chunk, externalAccessor, v.x + 1, v.y, v.z) == id;
+        target = queryBlockstate(chunk, externalAccessor, v.x + 1, v.y, v.z);
+        break;
     case PosY:
-        return queryBlockstate(chunk, externalAccessor, v.x, v.y + 1, v.z) == id;
+        target = queryBlockstate(chunk, externalAccessor, v.x, v.y + 1, v.z);
+        break;
     case PosZ:
-        return queryBlockstate(chunk, externalAccessor, v.x, v.y, v.z + 1) == id;
+        target = queryBlockstate(chunk, externalAccessor, v.x, v.y, v.z + 1);
+        break;
     }
+    return handler->querySkipsRendering(id, target, f);
 }
 
 auto OMVoxelCompiler::compile(const world::OMChunk<16> &chunk,
@@ -328,8 +331,7 @@ auto OMVoxelCompiler::compile(const world::OMChunk<16> &chunk,
             {
                 if (handler->queryPartFaceEnabled(bsid, i, f) &&
                     !checkExistSoild(chunk, externalAccessor, v.first, handler->queryPartFaceCull(bsid, i, f)) &&
-                    !checkSkip(chunk, externalAccessor, v.first, handler->queryPartFaceCull(bsid, i, f), v.second,
-                               bsid))
+                    !checkSkip(chunk, externalAccessor, v.first, handler->queryPartFaceCull(bsid, i, f), v.second))
                 {
                     auto [ao1, ao2, ao3, ao4] =
                         handler->queryPartAmbientOcclusion(bsid, i) && handler->queryPartShade(bsid, i)
