@@ -343,6 +343,14 @@ struct OMVoxelSkyDisc
     float discHeight;
 };
 
+struct OMVoxelSunrise
+{
+    glm::vec4 sunColor;
+    float sunAngle;
+    float range;
+    float height;
+};
+
 struct OMVoxelLightMap
 {
     float skyFactor;
@@ -421,6 +429,7 @@ class OMVoxelColorManager
     virtual auto getBossOverlayWorldDarkeningFactor() -> float = 0;
     virtual auto getBrightnessFactor() -> float = 0;
     virtual auto getFogColor() -> glm::vec3 = 0;
+    virtual auto getSunriseColor() -> glm::vec4 = 0;
 
     inline auto isDirty() -> bool
     {
@@ -465,6 +474,9 @@ class OMVoxelManager
     OMRendererTexture *textureAtlasSecondary;
     OMRendererTempTarget *lightmap;
     OMVoxelColorManager *colorManager;
+
+    OMRendererBuffer *sunrise;
+    OMRendererPipeline *sunrisePipeline;
 
   private:
     int samples = 4;

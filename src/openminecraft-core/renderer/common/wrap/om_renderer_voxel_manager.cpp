@@ -224,6 +224,24 @@ OMVoxelManager::OMVoxelManager(OMRenderer *renderer, OMRendererRenderTarget *res
                           ->depthOp(Greater)
                           ->buildN();
 
+    sunrisePipeline = renderer->createPipeline()
+                          ->input(UniformBuffer)
+                          ->inputName("Camera")
+                          ->input(UniformBuffer)
+                          ->inputName("SunRiseData")
+                          ->output(cutoutTargetMS->target)
+                          ->samples(samples)
+                          ->shader(renderer->shaderManager.preprocess("core/voxel/sunrise.frag.glsl", Fragment,
+                                                                      GLSLSource, simpleFormat))
+                          ->shader(renderer->shaderManager.preprocess("core/voxel/sunrise.vert.glsl", Vertex,
+                                                                      GLSLSource, simpleFormat))
+                          ->format(simpleFormat)
+                          ->blendFunc({SrcAlpha, OneMinusSrcAlpha, SrcAlpha, OneMinusSrcAlpha})
+                          ->blend(true)
+                          ->depth(false, true)
+                          ->depthOp(Greater)
+                          ->buildN();
+
     lightmapPipeline = renderer->createPipeline()
                            ->input(UniformBuffer)
                            ->inputName("LightmapInfo")
@@ -276,6 +294,7 @@ OMVoxelManager::OMVoxelManager(OMRenderer *renderer, OMRendererRenderTarget *res
     debugoffs = renderer->allocateBuffer(VertexData, 12 * 2 * 3 * sizeof(float));
     skydisc = renderer->allocateBuffer(Uniform, sizeof(OMVoxelSkyDisc));
     fogdata = renderer->allocateBuffer(Uniform, sizeof(float) * 5);
+    sunrise = renderer->allocateBuffer(Uniform, sizeof(OMVoxelSunrise));
 
     lightmapData = renderer->allocateBuffer(Uniform, sizeof(OMVoxelLightMap));
 
@@ -303,6 +322,7 @@ OMVoxelManager::OMVoxelManager(OMRenderer *renderer, OMRendererRenderTarget *res
     skyDiscPipeline->bindInput(1, skydisc);
     lightmapPipeline->bindInput(0, lightmapData);
     skyPipeline->bindInput(0, skydisc);
+    sunrisePipeline->bindInput(1, sunrise);
 }
 OMVoxelManager::~OMVoxelManager()
 {
@@ -319,6 +339,7 @@ OMVoxelManager::~OMVoxelManager()
     delete chunkoffs;
     delete debugoffs;
     delete skydisc;
+    delete sunrise;
     delete pipeline;
     delete complexPipeline;
     delete translucentPipeline;
@@ -330,6 +351,7 @@ OMVoxelManager::~OMVoxelManager()
     delete cutoutTarget;
     delete translucentTarget;
     delete skyDiscPipeline;
+    delete sunrisePipeline;
 }
 
 void OMVoxelManager::unloadChunk(int i)
@@ -350,6 +372,16 @@ auto srgbToLinear(const glm::vec3 &c) -> glm::vec3
     return glm::mix(lo, hi, s);
 }
 
+auto srgbToLinear(const glm::vec4 &cp) -> glm::vec4
+{
+    auto c = glm::vec3(cp.x, cp.y, cp.z);
+    glm::vec3 lo = c / 12.92f;
+    glm::vec3 hi = glm::pow((c + 0.055f) / 1.055f, glm::vec3(2.4f));
+    glm::vec3 s = glm::step(glm::vec3(0.04045f), c);
+    auto r = glm::mix(lo, hi, s);
+    return {r.x, r.y, r.z, cp.w};
+}
+
 auto OMVoxelManager::updateColor() -> void
 {
     if (colorManager->isDirty())
@@ -357,6 +389,8 @@ auto OMVoxelManager::updateColor() -> void
         OMVoxelSkyDisc disc = {srgbToLinear(colorManager->getSkyDiscColor()), 256,
                                srgbToLinear(colorManager->getFogColor()), 16};
         skydisc->updateData(&disc);
+        OMVoxelSunrise ris = {srgbToLinear(colorManager->getSunriseColor()), 50.0f, 256, 16};
+        sunrise->updateData(&ris);
         auto fg = srgbToLinear(colorManager->getFogColor());
         std::array<float, 5> d = {colorManager->getFogRange().x, colorManager->getFogRange().y, fg.r, fg.g, fg.b};
         fogdata->updateData(d.data());
@@ -538,6 +572,8 @@ auto OMVoxelManager::submit(OMRendererTask *task, OMRendererTempTarget *resolveT
                    ->drawN(6)
                    ->pipeline(skyDiscPipeline)
                    ->drawN(24)
+                   ->pipeline(sunrisePipeline)
+                   ->drawN(24)
                    ->pipeline(pipeline)
                    ->vertexBuffer({voxelLayer->buf()->buffer})
                    ->drawInstanceN(6, voxelLayer->buf()->totalSize / sizeof(OMVoxel))
@@ -577,5 +613,6 @@ void OMVoxelManager::bindCameraBuffer(OMRendererBuffer *cameraBuffer)
     translucentPipeline->bindInput(0, cameraBuffer);
     translucentComplexPipeline->bindInput(0, cameraBuffer);
     skyDiscPipeline->bindInput(0, cameraBuffer);
+    sunrisePipeline->bindInput(0, cameraBuffer);
 }
 } // namespace openminecraft::renderer::common::wrap

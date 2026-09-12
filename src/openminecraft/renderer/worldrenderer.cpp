@@ -4,6 +4,7 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/quaternion_common.hpp"
 #include "glm/ext/vector_float3.hpp"
+#include "glm/fwd.hpp"
 #include "openminecraft-shell/data/block/om_block_registery.hpp"
 #include "openminecraft-shell/data/block/om_blockstate_registry.hpp"
 #include "openminecraft-shell/data/block/om_blockstate_resolver.hpp"
@@ -101,6 +102,10 @@ class OMWorldColorManager : public wrap::OMVoxelColorManager
     {
         return glm::vec3(0.7529, 0.8471, 1.0) * glm::mix(glm::vec3(0.05, 0.05, 0.09), glm::vec3(1.0), gameTime);
     }
+    auto getSunriseColor() -> glm::vec4 override
+    {
+        return {0.855, 0.388, 0.200, 1.0};
+    }
 };
 static OMWorldColorManager *colorManager = new OMWorldColorManager;
 static std::chrono::steady_clock::time_point tp = {};
@@ -147,7 +152,7 @@ OMWorldRenderer::OMWorldRenderer(OMRenderer *renderer, std::shared_ptr<basics::O
     }
     textureAtlas->build();
 
-    colorManager->updateGameTime(1.0);
+    colorManager->updateGameTime(0.4);
     voxelManager = new wrap::OMVoxelManager(
         renderer, tempTarget->target, textureAtlas->texture, textureAtlas->textureSecondary, chunkManager,
         [&]() -> void { record(); }, this->voxelHandler,
