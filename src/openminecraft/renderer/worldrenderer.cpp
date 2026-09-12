@@ -104,7 +104,11 @@ class OMWorldColorManager : public wrap::OMVoxelColorManager
     }
     auto getSunriseColor() -> glm::vec4 override
     {
-        return {0.855, 0.388, 0.200, 0.7};
+        return {0.855, 0.388, 0.200, 1.0};
+    }
+    auto getSunAngle() -> float override
+    {
+        return 20.0f;
     }
 };
 static OMWorldColorManager *colorManager = new OMWorldColorManager;

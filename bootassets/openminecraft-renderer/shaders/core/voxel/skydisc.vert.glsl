@@ -20,19 +20,14 @@ void main()
 {
     vec4 actualPos;
     int id = vertexgen_id();
-    if (id % 3 == 0)
+    if (id == 0)
     {
         actualPos = vec4(0.0, 0.0, 0.0, 1.0);
         discColor = disc.diskCenterColor;
     }
-    else if (id % 3 == 1)
-    {
-        actualPos = vec4(sin(PI / 4 * (id / 3)), 0.0, cos(PI / 4 * (id / 3)), 1.0);
-        discColor = disc.diskSideColor;
-    }
     else
     {
-        actualPos = vec4(sin(PI / 4 * (id / 3 + 1)), 0.0, cos(PI / 4 * (id / 3 + 1)), 1.0);
+        actualPos = vec4(sin(PI / 4 * id), 0.0, cos(PI / 4 * id), 1.0);
         discColor = disc.diskSideColor;
     }
 

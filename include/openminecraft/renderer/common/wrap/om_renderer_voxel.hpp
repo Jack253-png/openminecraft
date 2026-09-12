@@ -347,8 +347,6 @@ struct OMVoxelSunrise
 {
     glm::vec4 sunColor;
     float sunAngle;
-    float range;
-    float height;
 };
 
 struct OMVoxelLightMap
@@ -430,6 +428,7 @@ class OMVoxelColorManager
     virtual auto getBrightnessFactor() -> float = 0;
     virtual auto getFogColor() -> glm::vec3 = 0;
     virtual auto getSunriseColor() -> glm::vec4 = 0;
+    virtual auto getSunAngle() -> float = 0;
 
     inline auto isDirty() -> bool
     {

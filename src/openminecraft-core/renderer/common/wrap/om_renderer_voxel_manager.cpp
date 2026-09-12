@@ -213,6 +213,7 @@ OMVoxelManager::OMVoxelManager(OMRenderer *renderer, OMRendererRenderTarget *res
                           ->inputName("SkyDiscData")
                           ->output(cutoutTargetMS->target)
                           ->samples(samples)
+                          ->primitiveType(TriangleFan)
                           ->shader(renderer->shaderManager.preprocess("core/voxel/skydisc.frag.glsl", Fragment,
                                                                       GLSLSource, simpleFormat))
                           ->shader(renderer->shaderManager.preprocess("core/voxel/skydisc.vert.glsl", Vertex,
@@ -231,6 +232,7 @@ OMVoxelManager::OMVoxelManager(OMRenderer *renderer, OMRendererRenderTarget *res
                           ->inputName("SunRiseData")
                           ->output(cutoutTargetMS->target)
                           ->samples(samples)
+                          ->primitiveType(TriangleFan)
                           ->shader(renderer->shaderManager.preprocess("core/voxel/sunrise.frag.glsl", Fragment,
                                                                       GLSLSource, simpleFormat))
                           ->shader(renderer->shaderManager.preprocess("core/voxel/sunrise.vert.glsl", Vertex,
@@ -389,7 +391,7 @@ auto OMVoxelManager::updateColor() -> void
         OMVoxelSkyDisc disc = {srgbToLinear(colorManager->getSkyDiscColor()), 256,
                                srgbToLinear(colorManager->getFogColor()), 16};
         skydisc->updateData(&disc);
-        OMVoxelSunrise ris = {srgbToLinear(colorManager->getSunriseColor()), glm::radians(-20.0f), 120, -8};
+        OMVoxelSunrise ris = {srgbToLinear(colorManager->getSunriseColor()), colorManager->getSunAngle()};
         sunrise->updateData(&ris);
         auto fg = srgbToLinear(colorManager->getFogColor());
         std::array<float, 5> d = {colorManager->getFogRange().x, colorManager->getFogRange().y, fg.r, fg.g, fg.b};
@@ -571,9 +573,9 @@ auto OMVoxelManager::submit(OMRendererTask *task, OMRendererTempTarget *resolveT
                    ->pipeline(skyPipeline)
                    ->drawN(6)
                    ->pipeline(skyDiscPipeline)
-                   ->drawN(24)
+                   ->drawN(10)
                    ->pipeline(sunrisePipeline)
-                   ->drawN(24)
+                   ->drawN(18)
                    ->pipeline(pipeline)
                    ->vertexBuffer({voxelLayer->buf()->buffer})
                    ->drawInstanceN(6, voxelLayer->buf()->totalSize / sizeof(OMVoxel))
