@@ -147,7 +147,7 @@ OMWorldRenderer::OMWorldRenderer(OMRenderer *renderer, std::shared_ptr<basics::O
     }
     textureAtlas->build();
 
-    // colorManager->updateGameTime(1.0);
+    colorManager->updateGameTime(1.0);
     voxelManager = new wrap::OMVoxelManager(
         renderer, tempTarget->target, textureAtlas->texture, textureAtlas->textureSecondary, chunkManager,
         [&]() -> void { record(); }, this->voxelHandler,
