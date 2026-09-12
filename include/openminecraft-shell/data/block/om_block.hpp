@@ -6,6 +6,7 @@
 #include "openminecraft-shell/data/om_identifier.hpp"
 #include "openminecraft/renderer/common/wrap/om_renderer_voxel.hpp"
 #include <initializer_list>
+#include <memory>
 #include <unordered_map>
 namespace openminecraftshell::data::block
 {
@@ -46,74 +47,70 @@ template <> struct hash<openminecraftshell::data::block::OMBlockModelIdentifier>
 using openminecraft::renderer::common::wrap::OMVoxelFacing;
 namespace openminecraftshell::data::block
 {
-class OMBlock
+class OMBlock : public std::enable_shared_from_this<OMBlock>
 {
   public:
     OMBlock() = default;
     ~OMBlock() = default;
-    auto isSoild(bool v) -> OMBlock &
+    auto isSoild(bool v) -> std::shared_ptr<OMBlock>
     {
         soild = v;
-        return *this;
+        return shared_from_this();
     }
-    auto isTranslucent(bool v) -> OMBlock &
+    auto isTranslucent(bool v) -> std::shared_ptr<OMBlock>
     {
         translucent = v;
-        return *this;
+        return shared_from_this();
     }
 
     virtual auto skipsRendering(const OMBlockStateCombined &state, const OMBlockStateCombined &other,
                                 OMVoxelFacing direction) -> bool
     {
-        if (state.block == other.block)
-        {
-            return true;
-        }
         return false;
     }
 
-    auto prop(std::string n, std::initializer_list<std::string> values) -> OMBlock &
+    auto prop(std::string n, std::initializer_list<std::string> values) -> std::shared_ptr<OMBlock>
     {
         properties[n] = values;
-        return *this;
+        return shared_from_this();
     }
-    auto propFacing() -> OMBlock &
+    auto propFacing() -> std::shared_ptr<OMBlock>
     {
         return prop("facing", {"east", "west", "north", "south"});
     }
-    auto propInWall() -> OMBlock &
+    auto propInWall() -> std::shared_ptr<OMBlock>
     {
         return prop("in_wall", {"true", "false"});
     }
-    auto propOpen() -> OMBlock &
+    auto propOpen() -> std::shared_ptr<OMBlock>
     {
         return prop("open", {"true", "false"});
     }
-    auto propPowered() -> OMBlock &
+    auto propPowered() -> std::shared_ptr<OMBlock>
     {
         return prop("powered", {"true", "false"});
     }
-    auto propHalf() -> OMBlock &
+    auto propHalf() -> std::shared_ptr<OMBlock>
     {
         return prop("half", {"upper", "lower"});
     }
-    auto propWaterlogged() -> OMBlock &
+    auto propWaterlogged() -> std::shared_ptr<OMBlock>
     {
         return prop("water_logged", {"true", "false"});
     }
-    auto propHinge() -> OMBlock &
+    auto propHinge() -> std::shared_ptr<OMBlock>
     {
         return prop("hinge", {"left", "right"});
     }
-    auto propFace() -> OMBlock &
+    auto propFace() -> std::shared_ptr<OMBlock>
     {
         return prop("face", {"ceiling", "floor", "wall"});
     }
-    auto propRotation() -> OMBlock &
+    auto propRotation() -> std::shared_ptr<OMBlock>
     {
         return prop("rotation", {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"});
     }
-    auto propSnowy() -> OMBlock &
+    auto propSnowy() -> std::shared_ptr<OMBlock>
     {
         return prop("snowy", {"true", "false"});
     }

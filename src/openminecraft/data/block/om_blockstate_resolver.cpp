@@ -194,8 +194,8 @@ void OMBlockstateResolver::buildModel(OMIdentifier ident, OMBlockState state)
             {
                 if (var.second->type() == openminecraft::io::json::Object)
                 {
-                    auto i = compiler.composeBlock({requiredModels[ident][identFrom(var.second)]}, blk.soild,
-                                                   blk.translucent);
+                    auto i = compiler.composeBlock({requiredModels[ident][identFrom(var.second)]}, blk->soild,
+                                                   blk->translucent);
                     states[ident][st].emplace_back(i);
                     return;
                 }
@@ -204,7 +204,7 @@ void OMBlockstateResolver::buildModel(OMIdentifier ident, OMBlockState state)
                     for (auto &lp : var.second->getArray())
                     {
                         auto i =
-                            compiler.composeBlock({requiredModels[ident][identFrom(lp)]}, blk.soild, blk.translucent);
+                            compiler.composeBlock({requiredModels[ident][identFrom(lp)]}, blk->soild, blk->translucent);
                         states[ident][st].emplace_back(i);
                     }
                     return;
@@ -238,7 +238,7 @@ void OMBlockstateResolver::buildModel(OMIdentifier ident, OMBlockState state)
             }
         }
 
-        auto i = compiler.composeBlock(ids, blk.soild, blk.translucent);
+        auto i = compiler.composeBlock(ids, blk->soild, blk->translucent);
         states[ident][st].emplace_back(i);
         return;
     }

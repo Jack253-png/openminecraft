@@ -24,7 +24,7 @@ void registerBlockstates()
         std::vector<OMBlockState> states = {};
         states.emplace_back("");
 
-        for (const auto &pp : blockRegistery.getRegistry(l.first).properties)
+        for (const auto &pp : blockRegistery.getRegistry(l.first)->properties)
         {
             auto oldStates = states;
             std::vector<OMBlockState> newStates;

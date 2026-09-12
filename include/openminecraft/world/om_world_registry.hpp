@@ -12,7 +12,7 @@ template <typename K, typename T> class OMWorldRegistry
     OMWorldRegistry() = default;
     ~OMWorldRegistry() = default;
 
-    auto registerItem(K name, T &item) -> T &
+    auto registerItem(K name, T item) -> T &
     {
         nameToId[std::move(name)] = nextId;
         idToRegistry[nextId] = item;

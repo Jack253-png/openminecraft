@@ -71,7 +71,7 @@ auto OMModelPrecompiler::querySkipsRendering(int bsid, int tgbsid,
 {
     const auto &b = block::blockstateRegistry.idToRegistry[bsid];
     const auto &tb = block::blockstateRegistry.idToRegistry[tgbsid];
-    return block::blockRegistery.getRegistry(b.block).skipsRendering(b, tb, d);
+    return block::blockRegistery.getRegistry(b.block)->skipsRendering(b, tb, d);
 }
 auto OMModelPrecompiler::queryTranslucent(int bsid) -> bool
 {
