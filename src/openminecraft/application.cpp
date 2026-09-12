@@ -122,6 +122,7 @@ void OMApplication::mainLoop(OMBackend backend)
                     using data::block::blockstateRegistry;
                     world::OMChunk<16> cnk(cx, cy, cz);
                     cnk.setBlock(0, 0, 0, blockstateRegistry.id(data::OMIdentifier("minecraft:white_stained_glass[]")));
+                    cnk.setBlock(15, 0, 0, blockstateRegistry.id(data::OMIdentifier("minecraft:glass[]")));
                     cnk.setBlock(0, 1, 1, blockstateRegistry.id(data::OMIdentifier("minecraft:copper_ore[]")));
                     cnk.setBlock(2, 0, 0,
                                  blockstateRegistry.id(data::OMIdentifier("minecraft:grass_block[snowy=false]")));
@@ -147,7 +148,6 @@ void OMApplication::mainLoop(OMBackend backend)
                                      "minecraft:cherry_hanging_sign[attached=false,rotation=3,water_logged=false]")));
                     cnk.setBlock(0, 1, 2, blockstateRegistry.id(data::OMIdentifier("minecraft:copper_ore[]")));
                     cnk.setBlock(15, 1, 1, blockstateRegistry.id(data::OMIdentifier("minecraft:copper_ore[]")));
-                    cnk.setBlock(15, 0, 0, blockstateRegistry.id(data::OMIdentifier("minecraft:stone[]")));
                     cnk.setBlock(15, 1, 2, blockstateRegistry.id(data::OMIdentifier("minecraft:copper_ore[]")));
                     cnk.setBlock(15, 1, 0,
                                  blockstateRegistry.id(data::OMIdentifier(

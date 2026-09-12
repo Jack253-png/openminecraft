@@ -76,6 +76,7 @@ struct OMModel
     std::vector<bool> partComplex;
     bool soild;
     bool translucent;
+    bool skipRendering;
 };
 class OMModelPrecompiler : public openminecraft::renderer::common::wrap::OMVoxelHandler
 {
@@ -88,11 +89,12 @@ class OMModelPrecompiler : public openminecraft::renderer::common::wrap::OMVoxel
         -> OMModelFace;
     auto wrapPart(std::shared_ptr<openminecraft::io::json::OMJsonNode>) -> OMModelPart;
 
-    auto composeBlock(std::vector<int>, bool = true, bool = false) -> int;
+    auto composeBlock(std::vector<int>, bool = true, bool = false, bool = false) -> int;
 
     auto loadModelPart(OMIdentifier) -> int;
     auto loadModelPartWithArgs(OMIdentifier, int, int, int, bool) -> int;
 
+    auto querySkipsRendering(int bsid) -> bool override;
     auto queryNumParts(int bsid) -> int override;
     auto queryPartFaceEnabled(int bsid, int pid, openminecraft::renderer::common::wrap::OMVoxelFacing) -> bool override;
     auto queryPartFaceTex(int bsid, int pid, openminecraft::renderer::common::wrap::OMVoxelFacing) -> int override;

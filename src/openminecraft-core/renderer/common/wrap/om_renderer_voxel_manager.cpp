@@ -152,10 +152,10 @@ OMVoxelManager::OMVoxelManager(OMRenderer *renderer, OMRendererRenderTarget *res
             ->samples(samples)
             ->setCullMode(renderer::common::Back)
             ->setFrontClockwise(true)
-            ->shader(renderer->shaderManager.preprocess("core/voxel/voxel.oit.frag.glsl", Fragment, GLSLSource, format))
+            ->shader(renderer->shaderManager.preprocess("core/voxel/voxel.frag.glsl", Fragment, GLSLSource, format))
             ->shader(renderer->shaderManager.preprocess("core/voxel/voxel.vert.glsl", Vertex, GLSLSource, format))
             ->format(format)
-            ->blendFunc({One, One, Zero, OneMinusSrcAlpha})
+            ->blendFunc({SrcAlpha, One, Zero, OneMinusSrcAlpha})
             ->blend(true)
             ->depth(true, false)
             ->depthOp(GreaterOrEqual)
@@ -177,12 +177,12 @@ OMVoxelManager::OMVoxelManager(OMRenderer *renderer, OMRendererRenderTarget *res
                                      ->samples(samples)
                                      ->setCullMode(renderer::common::Back)
                                      ->setFrontClockwise(true)
-                                     ->shader(renderer->shaderManager.preprocess(
-                                         "core/voxel/voxelcomplex.oit.frag.glsl", Fragment, GLSLSource, formatComplex))
+                                     ->shader(renderer->shaderManager.preprocess("core/voxel/voxelcomplex.frag.glsl",
+                                                                                 Fragment, GLSLSource, formatComplex))
                                      ->shader(renderer->shaderManager.preprocess("core/voxel/voxelcomplex.vert.glsl",
                                                                                  Vertex, GLSLSource, formatComplex))
                                      ->format(formatComplex)
-                                     ->blendFunc({One, One, Zero, OneMinusSrcAlpha})
+                                     ->blendFunc({SrcAlpha, One, Zero, OneMinusSrcAlpha})
                                      ->blend(true)
                                      ->depth(true, false)
                                      ->depthOp(GreaterOrEqual)
@@ -342,9 +342,12 @@ void OMVoxelManager::unloadChunk(int i)
     voxelTranslucentComplexLayer->loadData(i, tcm);
 }
 
-auto srgbToLinear(glm::vec3 c) -> glm::vec3
+auto srgbToLinear(const glm::vec3 &c) -> glm::vec3
 {
-    return glm::pow(c, glm::vec3(2.2f));
+    glm::vec3 lo = c / 12.92f;
+    glm::vec3 hi = glm::pow((c + 0.055f) / 1.055f, glm::vec3(2.4f));
+    glm::vec3 s = glm::step(glm::vec3(0.04045f), c);
+    return glm::mix(lo, hi, s);
 }
 
 auto OMVoxelManager::updateColor() -> void
@@ -354,7 +357,7 @@ auto OMVoxelManager::updateColor() -> void
         OMVoxelSkyDisc disc = {srgbToLinear(colorManager->getSkyDiscColor()), 256,
                                srgbToLinear(colorManager->getFogColor()), 16};
         skydisc->updateData(&disc);
-        auto fg = colorManager->getFogColor();
+        auto fg = srgbToLinear(colorManager->getFogColor());
         std::array<float, 5> d = {colorManager->getFogRange().x, colorManager->getFogRange().y, fg.r, fg.g, fg.b};
         fogdata->updateData(d.data());
 

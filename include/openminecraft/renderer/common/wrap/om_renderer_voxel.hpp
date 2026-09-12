@@ -154,6 +154,7 @@ class OMVoxelHandler
     virtual ~OMVoxelHandler()
     {
     }
+    virtual auto querySkipsRendering(int bsid) -> bool = 0;
     virtual auto queryNumParts(int bsid) -> int = 0;
     virtual auto queryPartFaceEnabled(int bsid, int pid, OMVoxelFacing) -> bool = 0;
     virtual auto queryPartFaceTex(int bsid, int pid, OMVoxelFacing) -> int = 0;
@@ -256,6 +257,10 @@ class OMVoxelHandlerDummy : public OMVoxelHandler
     {
         return false;
     }
+    auto querySkipsRendering(int bsid) -> bool override
+    {
+        return false;
+    }
 };
 
 class OMVoxelCompiler
@@ -272,6 +277,8 @@ class OMVoxelCompiler
                    int y, int z, OMVoxelFacing, int bsid, int pid) -> std::tuple<uint8_t, uint8_t, uint8_t, uint8_t>;
     auto checkExistSoild(const world::OMChunk<16> &, std::function<uint32_t(glm::ivec3, int64_t, int64_t, int64_t)>,
                          glm::ivec3, OMVoxelFacing) -> bool;
+    auto checkSkip(const world::OMChunk<16> &, std::function<uint32_t(glm::ivec3, int64_t, int64_t, int64_t)>,
+                   glm::ivec3, OMVoxelFacing, uint32_t, uint32_t) -> bool;
     auto compile(const world::OMChunk<16> &, std::function<uint32_t(glm::ivec3, int64_t, int64_t, int64_t)>,
                  int chunkid, std::function<void(OMVoxel)>, std::function<void(OMVoxelComplex)>,
                  std::function<void(OMVoxel)>, std::function<void(OMVoxelComplex)>) -> void;

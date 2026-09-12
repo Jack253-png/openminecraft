@@ -6,6 +6,7 @@
 #include "openminecraft/io/json/om_io_ast_json.hpp"
 #include <initializer_list>
 #include <memory>
+#include <sys/unistd.h>
 #include <unordered_map>
 #include <utility>
 namespace openminecraftshell::data::block
@@ -61,6 +62,11 @@ class OMBlock
         translucent = v;
         return *this;
     }
+    auto skipsRendering(bool v) -> OMBlock &
+    {
+        skipRendering = v;
+        return *this;
+    }
 
     auto prop(std::string n, std::initializer_list<std::string> values) -> OMBlock &
     {
@@ -110,6 +116,7 @@ class OMBlock
 
     bool soild = true;
     bool translucent = false;
+    bool skipRendering = false;
     std::unordered_map<std::string, std::vector<std::string>> properties;
 
     auto operator=(const OMBlock &other) -> OMBlock & = default;

@@ -278,6 +278,35 @@ auto OMVoxelCompiler::checkExistSoild(const world::OMChunk<16> &chunk,
     }
 }
 
+auto OMVoxelCompiler::checkSkip(const world::OMChunk<16> &chunk,
+                                std::function<uint32_t(glm::ivec3, int64_t, int64_t, int64_t)> externalAccessor,
+                                glm::ivec3 v, OMVoxelFacing f, uint32_t id, uint32_t bsid) -> bool
+{
+    if (!handler->querySkipsRendering(bsid))
+    {
+        return false;
+    }
+
+    switch (f)
+    {
+    default:
+    case None:
+        return false;
+    case NegX:
+        return queryBlockstate(chunk, externalAccessor, v.x - 1, v.y, v.z) == id;
+    case NegY:
+        return queryBlockstate(chunk, externalAccessor, v.x, v.y - 1, v.z) == id;
+    case NegZ:
+        return queryBlockstate(chunk, externalAccessor, v.x, v.y, v.z - 1) == id;
+    case PosX:
+        return queryBlockstate(chunk, externalAccessor, v.x + 1, v.y, v.z) == id;
+    case PosY:
+        return queryBlockstate(chunk, externalAccessor, v.x, v.y + 1, v.z) == id;
+    case PosZ:
+        return queryBlockstate(chunk, externalAccessor, v.x, v.y, v.z + 1) == id;
+    }
+}
+
 auto OMVoxelCompiler::compile(const world::OMChunk<16> &chunk,
                               std::function<uint32_t(glm::ivec3, int64_t, int64_t, int64_t)> externalAccessor,
                               int chunkid, std::function<void(OMVoxel)> commiter,
@@ -298,7 +327,9 @@ auto OMVoxelCompiler::compile(const world::OMChunk<16> &chunk,
             for (auto f : {NegX, NegY, NegZ, PosX, PosY, PosZ})
             {
                 if (handler->queryPartFaceEnabled(bsid, i, f) &&
-                    !checkExistSoild(chunk, externalAccessor, v.first, handler->queryPartFaceCull(bsid, i, f)))
+                    !checkExistSoild(chunk, externalAccessor, v.first, handler->queryPartFaceCull(bsid, i, f)) &&
+                    !checkSkip(chunk, externalAccessor, v.first, handler->queryPartFaceCull(bsid, i, f), v.second,
+                               bsid))
                 {
                     auto [ao1, ao2, ao3, ao4] =
                         handler->queryPartAmbientOcclusion(bsid, i) && handler->queryPartShade(bsid, i)
