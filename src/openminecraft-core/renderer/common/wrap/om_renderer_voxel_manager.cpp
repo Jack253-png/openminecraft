@@ -389,7 +389,7 @@ auto OMVoxelManager::updateColor() -> void
         OMVoxelSkyDisc disc = {srgbToLinear(colorManager->getSkyDiscColor()), 256,
                                srgbToLinear(colorManager->getFogColor()), 16};
         skydisc->updateData(&disc);
-        OMVoxelSunrise ris = {srgbToLinear(colorManager->getSunriseColor()), 50.0f, 256, 16};
+        OMVoxelSunrise ris = {srgbToLinear(colorManager->getSunriseColor()), glm::radians(-20.0f), 120, -8};
         sunrise->updateData(&ris);
         auto fg = srgbToLinear(colorManager->getFogColor());
         std::array<float, 5> d = {colorManager->getFogRange().x, colorManager->getFogRange().y, fg.r, fg.g, fg.b};
