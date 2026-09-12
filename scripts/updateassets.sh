@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+
+set -euo
+
 cd bootassets
 zip -9 -r boot.bundle .
 mv boot.bundle ..

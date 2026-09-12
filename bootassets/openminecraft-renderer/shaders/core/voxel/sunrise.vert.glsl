@@ -34,7 +34,7 @@ void main()
     }
 
     mat3 rotX90 = mat3(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0);
-    float angleZ = (sin(sun.sunAngle) < 0.0) ? 180.0 : 0.0;
+    float angleZ = (sin(radians(sun.sunAngle)) < 0.0) ? 180.0 : 0.0;
     float zRad = radians(angleZ + 90.0);
     float cz = cos(zRad);
     float sz = sin(zRad);
